@@ -20,6 +20,8 @@ The command sent by the controller to the IoT consists of 42 bytes. The 9th byte
 | 20 | Batttery |
 | last two bytes | CRC-16/XMODEM checksum |
 
+#### Example: `46 58 0C FF 00 22 11 00 00 40 00 00 41 3F 60 42 00 FF 44 64 52 00 61 F1 80 00 00 72 01 5C 01 59 82 00 00 00 00 E0 00 00 0A B3`
+
 
 ## Display Communication
 - Baudrate: `115200`
@@ -50,3 +52,5 @@ The following table shows the known meaning of the bytes in the commands send to
 | 44 | Driving No Riding |
 | 45 | Driving Max Speed |
 | 51 | Upgrading |
+
+#### Example: `4C 42 44 43 50 01 10 11 00 09 01 31 01 1E 02 00 CD 01 00 9A`
