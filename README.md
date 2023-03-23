@@ -4,7 +4,7 @@
 
 
 The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can controll it with our own app.
-If you find out more about the communication, pleasy submit it here.
+If you find out more about the communication, please submit it here.
 
 I am currently working on the PCB and the App. As soon as I have a working prototype, I will published it here.
 
@@ -31,6 +31,7 @@ The following table shows the known meaning of the bytes in the commands send to
 | 12 | Status (see below) |
 | 14 | Batttery |
 | 16-17 | Speed |
+| last byte | checksum |
 
 
 #### Status Bytes:
