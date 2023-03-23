@@ -3,8 +3,10 @@
 
 
 
-The goal of this project is to replace the IoT of the Lime Gen 3 with a custom, so we can controll it with our own app.
+The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can controll it with our own app.
 If you find out more about the communication, pleasy submit it here.
+
+I am currently working on the PCB and the App. As soon as i have a working prototype, it will be published here.
 
 
 ## Controller Communication
