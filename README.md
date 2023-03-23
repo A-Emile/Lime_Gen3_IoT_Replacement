@@ -1,4 +1,6 @@
 # Lime_Gen3_IoT_Replacement
+<b>Note:</b> This project is not endorsed or supported by Lime or any affiliated companies.
+
 The goal of this project is to replace the IoT of the Lime Gen 3 with a custom, so we can controll it with our own app.
 If you find out more about the communication, pleasy submit it here.
 
