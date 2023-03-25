@@ -31,6 +31,11 @@ Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_R
 
 If you want, you can connect the speaker to `GPIO 14`.
 
+### Download the App
+You can download the apk here: [Limer.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/Limer.apk)
+
+Currently only compatible with android and is only looking good with Material You compatible phones.
+
 ## Controller Communication
 To unlock the controller, the blue wire that is connected to the IoT needs to be supplied with 3.3V, and the hex command `4643110100084C494D4542494B45BE8A` needs to be sent at a baudrate of 9600 every 500ms. Cutting the 3.3V supply and stopping the command transmission will power off the controller after approximately 60 seconds.
 
