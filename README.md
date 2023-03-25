@@ -31,10 +31,21 @@ Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_R
 
 If you want, you can connect the speaker to `GPIO 14`.
 
-### Download the App
-You can download the apk here: [Limer.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/Limer.apk)
+### Usage
+You can download the app here: [Limer.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/Limer.apk)
+
+The default bluetooth password is `123456789`.
 
 Currently only compatible on android and is only looking good with Material You compatible phones.
+
+If you dont want/can use the app, you can just download a bluetooth terminal app like nRF Connect ([Play Store](https://play.google.com/store/apps/details?id=no.nordicsemi.android.mcp&amp;hl=de&amp;gl=US) | [App Store](https://apps.apple.com/de/app/nrf-connect-for-mobile/id1054362403)) and send the commands yourself:
+
+| Commands | Action |
+| -------- | ------- |
+| `unlock`  | Unlocks the scooter |
+| `lock`    | Locks the scooter   |
+| `unlockforever`    | Keeps the scooter unlocked when disconnecting |
+| `alarm`   | let the scooter beeb (if speaker is connected ) |
 
 ## Controller Communication
 To unlock the controller, the blue wire that is connected to the IoT needs to be supplied with 3.3V, and the hex command `4643110100084C494D4542494B45BE8A` needs to be sent at a baudrate of 9600 every 500ms. Cutting the 3.3V supply and stopping the command transmission will power off the controller after approximately 60 seconds.
