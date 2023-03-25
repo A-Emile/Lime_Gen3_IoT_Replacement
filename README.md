@@ -11,10 +11,11 @@ I am currently working on the PCB and the App. As soon as I have a working proto
 ## Installation
 Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main/LimeIoT) folder to the esp32.
 
-Connect the wires to the esp32:
+##### Connect the wires to the esp32:
+
+<b>Note:</b> The controller gives you 36v. So you have to convert it stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
 
 ![LimeIoTConnector](https://user-images.githubusercontent.com/76005215/227736602-e234c2c0-7985-44d8-8eca-714c5f80a9b3.png)
-
 
 | Connector | ESP32 |
 | -------- | ------- |
@@ -29,7 +30,6 @@ Connect the wires to the esp32:
 | Display RX       | GPIO  17  |
 
 If you want, you can connect the speaker to `GPIO 14`.
-
 
 ## Controller Communication
 To unlock the controller, the blue wire that is connected to the IoT needs to be supplied with 3.3V, and the hex command `4643110100084C494D4542494B45BE8A` needs to be sent at a baudrate of 9600 every 500ms. Cutting the 3.3V supply and stopping the command transmission will power off the controller after approximately 60 seconds.
