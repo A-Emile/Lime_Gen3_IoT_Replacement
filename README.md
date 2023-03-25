@@ -43,7 +43,7 @@ If you dont want/can use the app, you can just download a bluetooth terminal app
 | Commands | Action |
 | -------- | ------- |
 | `unlock`  | Unlocks the scooter |
-| `lock`    | Locks the scooter   |
+| `lock`    | Turns off the controller |
 | `unlockforever`    | Keeps the scooter unlocked when disconnecting |
 | `alarm`   | let the scooter beeb (if speaker is connected ) |
 
