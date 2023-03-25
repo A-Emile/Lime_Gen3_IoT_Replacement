@@ -13,7 +13,7 @@ Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_R
 
 ##### Connect the wires to the esp32:
 
-<b>Note:</b> The controller gives you 36v. So you have to convert it stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
+<b>Note:</b> The controller gives you 36v. So you have to convert it to stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
 
 ![LimeIoTConnector](https://user-images.githubusercontent.com/76005215/227736602-e234c2c0-7985-44d8-8eca-714c5f80a9b3.png)
 
