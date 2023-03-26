@@ -57,7 +57,7 @@ To unlock the controller, the blue wire that is connected to the IoT needs to be
 
 The command sent by the controller to the IoT consists of 42 bytes. The 9th byte represents the speed, and the 20th byte represents the battery level. The last two bytes of the command are a CRC-16/XMODEM checksum.
 
-| Byte | Meaning |
+| Byte number | Meaning |
 |--|--|
 | 9 | Speed |
 | 20 | Batttery |
