@@ -11,9 +11,10 @@ I am currently working on the PCB and the App. As soon as I have a working proto
 ## Installation
 Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main/LimeIoT) folder to the esp32.
 
-##### Connect the wires to the esp32:
 
 <b>Note:</b> The controller gives you 36v. So you have to convert it to stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
+
+Connect the wires:
 
 ![LimeIoTConnector](https://user-images.githubusercontent.com/76005215/227743332-2c972cca-d37c-4bcd-b67e-097f84796bc5.jpg)
 
