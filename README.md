@@ -39,7 +39,7 @@ Connect the wires:
 
 If you want, you can connect the speaker to `GPIO 14`.
 
-### Usage
+## Usage
 You can download the app here: [App.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/App.apk)
 
 The default bluetooth password is `123456789`. You can change it in the [ble_security.ino](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/blob/main/LimeIoT/ble_security.ino) file.
