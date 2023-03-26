@@ -8,6 +8,9 @@ If you find out more about the communication, please submit it here.
 
 I am currently working on the PCB and the App. As soon as I have a working prototype, I will published it here.
 
+## How it works
+The IoT module gets replaced with an ESP32 microcontroller to enable us to control the scooter with our app. The app communicates with the ESP32 using Bluetooth Low Energy (BLE). The ESP32 replaces the function of the original IoT while also providing real-time feedback on speed, battery level, and other information.
+
 ## Installation
 Install the ESP32 add-on for Arduino IDE if you doesnt have already. [Here is a tutorial](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/)
 
