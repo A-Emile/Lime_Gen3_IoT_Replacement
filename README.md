@@ -9,6 +9,8 @@ If you find out more about the communication, please submit it here.
 I am currently working on the PCB and the App. As soon as I have a working prototype, I will published it here.
 
 ## Installation
+Flash the controller with [unlocked firmware](https://cloud.scooterhacking.org/release/lime_dropbox/).
+
 Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main/LimeIoT) folder to the esp32.
 
 
