@@ -27,7 +27,7 @@ Connect the wires:
 
 | Connector | ESP32 |
 | -------- | ------- |
-| Controller lock  | GPIO 13   |
+| Controller lock  | GPIO 12   |
 | Controller RX    | GPIO 1    |
 | Controller TX    | GPIO 3    |
 | Controller 36v   | Buck converter -> ams1117 -> 5V |
@@ -37,7 +37,7 @@ Connect the wires:
 | Display TX       | GPIO  16  |
 | Display RX       | GPIO  17  |
 
-If you want, you can connect the speaker to `GPIO 14`.
+If you want, you can connect the speaker to `GPIO 13`.
 
 ## Usage
 You can download the app here: [App.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/App.apk)
