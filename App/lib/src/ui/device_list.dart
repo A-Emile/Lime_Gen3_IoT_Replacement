@@ -11,9 +11,8 @@ class DeviceListScreen extends StatelessWidget {
   const DeviceListScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      Consumer3<BleScanner, BleScannerState?, BleLogger>(
-        builder: (_, bleScanner, bleScannerState, bleLogger, __) => _DeviceList(
+  Widget build(BuildContext context) => Consumer2<BleScanner, BleScannerState?>(
+        builder: (_, bleScanner, bleScannerState, __) => _DeviceList(
           scannerState: bleScannerState ??
               const BleScannerState(
                 discoveredDevices: [],
@@ -21,8 +20,6 @@ class DeviceListScreen extends StatelessWidget {
               ),
           startScan: bleScanner.startScan,
           stopScan: bleScanner.stopScan,
-          toggleVerboseLogging: bleLogger.toggleVerboseLogging,
-          verboseLogging: bleLogger.verboseLogging,
         ),
       );
 }
@@ -32,15 +29,11 @@ class _DeviceList extends StatefulWidget {
     required this.scannerState,
     required this.startScan,
     required this.stopScan,
-    required this.toggleVerboseLogging,
-    required this.verboseLogging,
   });
 
   final BleScannerState scannerState;
   final void Function(List<Uuid>) startScan;
   final VoidCallback stopScan;
-  final VoidCallback toggleVerboseLogging;
-  final bool verboseLogging;
 
   @override
   _DeviceListState createState() => _DeviceListState();
@@ -79,7 +72,6 @@ class _DeviceListState extends State<_DeviceList> {
   }
 
   void _startScanning() {
-    final text = _uuidController.text;
     widget.startScan([Uuid.parse("653bb0e0-1d85-46b0-9742-3b408f4cb83f")]);
   }
 

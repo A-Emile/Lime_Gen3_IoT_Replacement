@@ -191,7 +191,9 @@ class UnlockButton extends StatefulWidget {
 
 class _UnlockButtonState extends State<UnlockButton> {
   late StreamSubscription<List<int>>? subscribeStream;
-  late bool isUnlocked;
+  bool isUnlocked = false;
+  int speed = 0;
+  int battery = 0;
 
   Future<void> subscribeCharacteristic() async {
     subscribeStream = widget.interactor
@@ -199,6 +201,8 @@ class _UnlockButtonState extends State<UnlockButton> {
         .listen((event) {
       setState(() {
         isUnlocked = event[0] == 1 ? true : false;
+        speed = event[2];
+        battery = event[3];
       });
     });
   }
@@ -219,7 +223,7 @@ class _UnlockButtonState extends State<UnlockButton> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(17),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
           ElevatedButton(
@@ -230,11 +234,10 @@ class _UnlockButtonState extends State<UnlockButton> {
               );
             },
             style: ElevatedButton.styleFrom(
-              shape: const CircleBorder(),
-              padding: const EdgeInsets.all(80),
+              minimumSize: Size(double.maxFinite, 50),
+              padding: const EdgeInsets.all(8),
               foregroundColor:
                   isUnlocked ? Colors.greenAccent : Colors.redAccent,
-              elevation: 5.0,
             ),
             onLongPress: isUnlocked
                 ? () {
@@ -269,20 +272,8 @@ class _UnlockButtonState extends State<UnlockButton> {
                         ));
                   }
                 : null,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(isUnlocked ? Icons.lock_open : Icons.lock_outline,
-                    size: 80.0),
-                const SizedBox(height: 8.0),
-                Text(
-                  isUnlocked ? "UNLOCKED" : "LOCKED",
-                  style: const TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            child: Icon(
+              isUnlocked ? Icons.lock_open : Icons.lock_outline,
             ),
           ),
           ElevatedButton(
@@ -291,12 +282,82 @@ class _UnlockButtonState extends State<UnlockButton> {
                   widget.characteristic, "alarm".codeUnits);
             },
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: const [
                 Icon(Icons.notifications_on_rounded),
-                Text("Ring"),
               ],
             ),
           ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "~${battery / 2.5}km",
+                style: TextStyle(
+                    fontSize: 28, height: 1, fontWeight: FontWeight.w400),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    battery < 10
+                        ? Icons.battery_0_bar_rounded
+                        : battery < 25
+                            ? Icons.battery_2_bar_rounded
+                            : battery < 50
+                                ? Icons.battery_3_bar_rounded
+                                : battery < 75
+                                    ? Icons.battery_4_bar_rounded
+                                    : battery < 80
+                                        ? Icons.battery_5_bar_rounded
+                                        : battery < 90
+                                            ? Icons.battery_6_bar_rounded
+                                            : Icons.battery_full_rounded,
+                    color: battery < 10
+                        ? Colors.red
+                        : battery < 50
+                            ? Colors.orange
+                            : Colors.green,
+                    size: 30,
+                  ),
+                  Text("${battery.toString()}%",
+                      style: TextStyle(
+                          fontSize: 28,
+                          height: 1,
+                          fontWeight: FontWeight.w400)),
+                ],
+              ),
+            ],
+          ),
+          Builder(builder: (context) {
+            if (!isUnlocked) {
+              return Container();
+            }
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  speed.toString(),
+                  style: TextStyle(
+                    fontSize: 200,
+                    fontWeight: FontWeight.w100,
+                    height: 1.1,
+                    color: speed > 20
+                        ? Colors.orange
+                        : speed > 25
+                            ? Colors.red
+                            : null,
+                  ),
+                ),
+                const Text(
+                  "Km/h",
+                  style: TextStyle(
+                      fontSize: 50, fontWeight: FontWeight.w300, height: 0.1),
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );
