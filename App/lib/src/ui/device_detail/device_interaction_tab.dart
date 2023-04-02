@@ -194,6 +194,8 @@ class _UnlockButtonState extends State<UnlockButton> {
   bool isUnlocked = false;
   int speed = 0;
   int battery = 0;
+  int light = 0;
+  bool isSending = false;
 
   Future<void> subscribeCharacteristic() async {
     subscribeStream = widget.interactor
@@ -203,8 +205,21 @@ class _UnlockButtonState extends State<UnlockButton> {
         isUnlocked = event[0] == 1 ? true : false;
         speed = event[2];
         battery = event[3];
+        light = event[4];
+        isSending = false;
       });
     });
+  }
+
+  Future<void> sendCommand(String cmd) async {
+    if (isSending) return;
+    isSending = true;
+    widget.interactor
+        .writeCharacterisiticWithResponse(
+          widget.characteristic,
+          cmd.codeUnits,
+        )
+        .then((value) => isSending = false);
   }
 
   @override
@@ -228,10 +243,10 @@ class _UnlockButtonState extends State<UnlockButton> {
         children: [
           ElevatedButton(
             onPressed: () {
-              widget.interactor.writeCharacterisiticWithResponse(
-                widget.characteristic,
-                isUnlocked ? "lock".codeUnits : "unlock".codeUnits,
-              );
+              sendCommand(isUnlocked ? "lock" : "unlock");
+              setState(() {
+                
+              });
             },
             style: ElevatedButton.styleFrom(
               minimumSize: Size(double.maxFinite, 50),
@@ -250,13 +265,7 @@ class _UnlockButtonState extends State<UnlockButton> {
                               ListTile(
                                 title: const Text("Keep unlocked"),
                                 leading: const Icon(Icons.lock_open_outlined),
-                                onTap: () => {
-                                  widget.interactor
-                                      .writeCharacterisiticWithResponse(
-                                          widget.characteristic,
-                                          "unlockforever".codeUnits),
-                                  Get.back(),
-                                },
+                                onTap: () => {sendCommand("unlockforever")},
                               ),
                             ],
                           ),
@@ -278,8 +287,7 @@ class _UnlockButtonState extends State<UnlockButton> {
           ),
           ElevatedButton(
             onPressed: () {
-              widget.interactor.writeCharacterisiticWithResponse(
-                  widget.characteristic, "alarm".codeUnits);
+              sendCommand("alarm");
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -289,13 +297,27 @@ class _UnlockButtonState extends State<UnlockButton> {
               ],
             ),
           ),
+          ElevatedButton(
+            onPressed: () {
+              sendCommand(light == 0 ? "lighton" : "lightoff");
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(light == 1
+                    ? Icons.light_mode_rounded
+                    : Icons.light_mode_outlined),
+              ],
+            ),
+          ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "~${battery / 2.5}km",
-                style: TextStyle(
+                style: const TextStyle(
                     fontSize: 28, height: 1, fontWeight: FontWeight.w400),
               ),
               Row(

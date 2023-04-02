@@ -1,4 +1,4 @@
-class RxCallback : public BLECharacteristicCallbacks {
+class MainBLECallback : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
     std::string value = pCharacteristic->getValue();
     if (value.length() > 0) {
@@ -7,17 +7,39 @@ class RxCallback : public BLECharacteristicCallbacks {
         command = command + value[i];
       }
 
-      Serial.println("*********");
-      Serial.print("command = ");
-      Serial.println(command);  // Presenta valor.
-
       if (command == "lock") {
+        lockBeeb();
         unlockForEver = 0;
-        lockScooter();
+        delay(500);
+        sendControllerCommand(offEscByte, sizeof(offEscByte));
+        isUnlocked = 0;
+        delay(800);
+        sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
+        delay(500);
+
+        lightIsOn = 0;
       }
       if (command == "unlock") {
         unlockForEver = 0;
-        unlockScooter();
+        digitalWrite(LOCK_PIN, HIGH);
+        controllerIsOn = 1;
+        unlockBeeb();
+        delay(500);
+        sendControllerCommand(onEscByte, sizeof(onEscByte));
+        isUnlocked = 1;
+        delay(500);
+        sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
+        delay(500);
+        lightIsOn = 1;
+      }
+      if (command == "on") {
+        digitalWrite(LOCK_PIN, HIGH);
+        controllerIsOn = 1;
+      }
+      if (command == "off") {
+        digitalWrite(LOCK_PIN, LOW);
+        controllerIsOn = 0;
+        isUnlocked = 1;
       }
       if (command == "unlockforever") {
         unlockForEver = 1;
@@ -27,28 +49,22 @@ class RxCallback : public BLECharacteristicCallbacks {
         tone(BUZZZER_PIN, 800, 100);
         delay(100);
       }
-      if (command == "light") {
-        tone(BUZZZER_PIN, 800, 100);
-        if (lightIsOn == 0) {
-          turnOnLight();
-        } else {
-          turnOffLight();
-        }
-      }
       if (command == "alarm") {
-        for (int i = 0; i < 60; i++) {
-          // Turn the speaker on at a frequency of 1000 Hz
-          tone(BUZZZER_PIN, 3000);
+        alarmBeeb();
+      }
+      if (command == "lighton") {
+        delay(500);
+        sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
+        delay(500);
 
-          // Wait for 0.1 seconds (the beep duration)
-          delay(200);
+        lightIsOn = 1;
+      }
+      if (command == "lightoff") {
+        delay(500);
+        sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
+        delay(500);
 
-          // Turn the speaker off
-          noTone(BUZZZER_PIN);
-
-          // Wait for 0.1 seconds (the beep interval)
-          delay(200);
-        }
+        lightIsOn = 0;
       }
     }
   }

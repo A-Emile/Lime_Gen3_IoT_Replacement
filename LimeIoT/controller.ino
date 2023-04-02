@@ -1,16 +1,35 @@
 // This is the code for the original controller
 
-  void readController() {
-    byte command[42];
-    Serial.readBytes(command, 42);
-    if (command[0] == 0x46) {
-      speed = (command[8] / 172.0) * 27.2;
-      battery = command[19];
+unsigned long previousMillis = 0;
+const long interval = 500;
+
+void readController() {
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    if (Serial.available() == 42) {
+      byte command[42];
+      Serial.readBytes(command, 42);
+
+      uint16_t new_checksum = crc16(command, sizeof(command) - 2, 0x1021, 0x0000, 0x0000, false, false);
+      uint16_t old_checksum = (uint16_t(command[40]) << 8) | uint16_t(command[41]);  // get a pointer to the last two bytes of the command array and interpret them as a uint16_t
+
+      // Check if the cammand has correct checksum
+      if (old_checksum == new_checksum) {
+        speed = (command[8] / 172.0) * max_speed;
+        battery = command[19];
+        throttle = command[28];
+      }
+    } else {
+    }
+    while (Serial.available() > 0) {
+      char t = Serial.read();
     }
   }
+}
 
-
-void sendUnlockCommand() {
-  byte hexCommand[] = { 0x46, 0x43, 0x11, 0x01, 0x00, 0x08, 0x4C, 0x49, 0x4D, 0x45, 0x42, 0x49, 0x4B, 0x45, 0xBE, 0x8A };
-  Serial.write(hexCommand, sizeof(hexCommand));
+void sendControllerCommand(byte* cmd, size_t len) {
+  Serial.write(cmd, len);
 }

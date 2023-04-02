@@ -1,19 +1,24 @@
 void setup() {
 
+  //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
+  xTaskCreatePinnedToCore(
+    UARTTaskCode,  /* Task function. */
+    "DisplayTask", /* name of task. */
+    10000,         /* Stack size of task */
+    NULL,          /* parameter of the task */
+    1,             /* priority of the task */
+    &UARTTask,     /* Task handle to keep track of created task */
+    0);            /* pin task to core 0 */
+
   // GPIO
   pinMode(LOCK_PIN, OUTPUT);
   digitalWrite(LOCK_PIN, LOW);
-
-  // configure LED PWM functionalitites
-  ledcSetup(ledChannel, freq, resolution);
-  // attach the channel to the GPIO to be controlled
-  ledcAttachPin(ledPin, ledChannel);
 
   Serial.begin(9600);
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
   Serial.println("Starting BLE work!");
 
-  BLEDevice::init("The Citrus Cruiser");
+  BLEDevice::init(SCOOTER_NAME);
   BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
   /*
    * Required in authentication process to provide displaying and/or input passkey or yes/no butttons confirmation
@@ -22,18 +27,22 @@ void setup() {
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
   BLEService *pService = pServer->createService(SERVICE_UUID);
-  pSpeedCharacteristic = pService->createCharacteristic(
-    CHARACTERISTIC_UUID_SPEED,
-    BLECharacteristic::PROPERTY_NOTIFY);
-  pSpeedCharacteristic->addDescriptor(new BLE2902());
 
-  pRxCharacteristic = pService->createCharacteristic(
-    CHARACTERISTIC_UUID_LOCK,
+  pMainCharacteristic = pService->createCharacteristic(
+    CHARACTERISTIC_UUID_MAIN,
     BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
 
-  pRxCharacteristic->setCallbacks(new RxCallback());
+  pMainCharacteristic->setCallbacks(new MainBLECallback());
 
-  pRxCharacteristic->addDescriptor(new BLE2902());
+  pMainCharacteristic->addDescriptor(new BLE2902());
+
+  pSettingsCharacteristic = pService->createCharacteristic(
+    CHARACTERISTIC_UUID_SETTINGS,
+    BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+
+  pSettingsCharacteristic->setCallbacks(new SettingsBLECallback());
+
+  pSettingsCharacteristic->addDescriptor(new BLE2902());
 
   pService->start();
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
