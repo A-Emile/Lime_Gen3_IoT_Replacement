@@ -21,6 +21,9 @@ class SettingsBLECallback : public BLECharacteristicCallbacks {
       case 0x03:
         customDisplayStatus = data[0] == 0x00 ? "" : String(data[1], HEX);
         break;
+      case 0x4:
+        turnOffDisplayLed();
+        break;
     }
     byte settingsByte[] = { max_speed, alarm_delay, alarm_freq, alarm_reps };
     pSettingsCharacteristic->setValue(settingsByte, sizeof(settingsByte));

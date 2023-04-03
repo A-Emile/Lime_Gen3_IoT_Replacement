@@ -15,21 +15,23 @@ class MainBLECallback : public BLECharacteristicCallbacks {
         isUnlocked = 0;
         delay(800);
         sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
-        delay(500);
+        delay(100);
 
         lightIsOn = 0;
       }
       if (command == "unlock") {
         unlockForEver = 0;
-        digitalWrite(LOCK_PIN, HIGH);
-        controllerIsOn = 1;
         unlockBeeb();
-        delay(500);
+        if (!controllerIsOn) {
+          delay(1000);
+          digitalWrite(LOCK_PIN, HIGH);
+          controllerIsOn = 1;
+        }
         sendControllerCommand(onEscByte, sizeof(onEscByte));
         isUnlocked = 1;
         delay(500);
         sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
-        delay(500);
+        delay(100);
         lightIsOn = 1;
       }
       if (command == "on") {
@@ -55,16 +57,30 @@ class MainBLECallback : public BLECharacteristicCallbacks {
       if (command == "lighton") {
         delay(500);
         sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
-        delay(500);
+        delay(300);
 
         lightIsOn = 1;
       }
       if (command == "lightoff") {
         delay(500);
         sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
-        delay(500);
+        delay(300);
 
         lightIsOn = 0;
+      }
+      if (command == "shutdown") {
+        digitalWrite(LOCK_PIN, LOW);
+        controllerIsOn = 0;
+        isUnlocked = 0;
+        lightIsOn = 0;
+        esp_deep_sleep_start();
+      }
+      if (command == "reboot") {
+        digitalWrite(LOCK_PIN, LOW);
+        controllerIsOn = 0;
+        isUnlocked = 0;
+        lightIsOn = 0;
+        esp_deep_sleep_start();
       }
     }
   }

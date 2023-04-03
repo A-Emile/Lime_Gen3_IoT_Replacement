@@ -5,7 +5,7 @@
 #include <BLEServer.h>
 #include <BLE2902.h>
 
-#define SCOOTER_NAME "The Citrus Cruiser One"
+#define SCOOTER_NAME "lme-UJEYGJA"
 const char *UPDATER_WIFI_PASSWORD = "123456789";
 const uint32_t BLE_PASSWORD = 123456789;
 
@@ -18,6 +18,8 @@ const int LOCK_PIN = 12;
 BLEServer *pServer = NULL;
 BLECharacteristic *pMainCharacteristic;
 BLECharacteristic *pSettingsCharacteristic;
+BLECharacteristic *pDebugCharacteristic;
+
 
 // Display Status Codes
 const String DISPLAY_STATUS_SCAN = "21";
@@ -50,20 +52,26 @@ uint8_t controllerIsOn = 0;
 uint8_t lightIsOn = 0;
 uint8_t unlockForEver = 0;
 float speed = 0;
+uint8_t alarmIsOn = 0;
 uint8_t throttle = 1;
 byte battery = 0x00;
+byte isCharging = 0x00;
 String customDisplayStatus = "";
 
 // Set Settings
 int alarm_delay = 200;
 int alarm_freq = 3000;
-int alarm_reps = 10;
-int max_speed = 27;
+int alarm_reps = 15;
+int max_speed = 28;
+
+RTC_DATA_ATTR int bootCount = 0;
 
 // BLE
 #define SERVICE_UUID "653bb0e0-1d85-46b0-9742-3b408f4cb83f"
 #define CHARACTERISTIC_UUID_MAIN "00c1acd4-f35b-4b5f-868d-36e5668d0929"
 #define CHARACTERISTIC_UUID_SETTINGS "7299b19e-7655-4c98-8cf1-69af4a65e982"
+#define CHARACTERISTIC_UUID_DEBUG "83ea7700-6ad7-4918-b1df-61031f95cf62"
+
 
 // Display Task
 TaskHandle_t UARTTask;
@@ -82,12 +90,14 @@ class MyServerCallbacks : public BLEServerCallbacks {
 void UARTTaskCode(void *pvParameters) {
   for (;;) {
     if (isUnlocked == 1) {
-      sendDisplayCommand(speed, battery, DISPLAY_STATUS_DRIVING);
+      sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_DRIVING);
     } else {
-      if (deviceConnected) {
-        sendDisplayCommand(speed, battery, DISPLAY_STATUS_LOCKED);
+      if (isCharging) {
+        sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_CHARGING);
+      } else if (deviceConnected) {
+        sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_LOCKED);
       } else {
-        sendDisplayCommand(speed, battery, DISPLAY_STATUS_SCAN);
+        sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_SCAN);
       }
     }
     delay(300);

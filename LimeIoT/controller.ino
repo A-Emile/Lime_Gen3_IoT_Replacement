@@ -11,7 +11,10 @@ void readController() {
 
     if (Serial.available() == 42) {
       byte command[42];
-      Serial.readBytes(command, 42);
+       Serial.readBytes(command, 42);
+
+      pDebugCharacteristic->setValue(command, sizeof(command));
+      pDebugCharacteristic->notify();
 
       uint16_t new_checksum = crc16(command, sizeof(command) - 2, 0x1021, 0x0000, 0x0000, false, false);
       uint16_t old_checksum = (uint16_t(command[40]) << 8) | uint16_t(command[41]);  // get a pointer to the last two bytes of the command array and interpret them as a uint16_t
@@ -21,6 +24,7 @@ void readController() {
         speed = (command[8] / 172.0) * max_speed;
         battery = command[19];
         throttle = command[28];
+        isCharging = command[21];
       }
     } else {
     }

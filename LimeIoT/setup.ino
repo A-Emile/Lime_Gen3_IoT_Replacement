@@ -12,7 +12,12 @@ void setup() {
 
   // GPIO
   pinMode(LOCK_PIN, OUTPUT);
-  digitalWrite(LOCK_PIN, LOW);
+  digitalWrite(LOCK_PIN, HIGH);
+  controllerIsOn = 1;
+
+  //Setup sleep wakeup on Touch Pad 3 ( GPIO15 )
+  touchSleepWakeUpEnable(T3,40);
+
 
   Serial.begin(9600);
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
@@ -35,6 +40,12 @@ void setup() {
   pMainCharacteristic->setCallbacks(new MainBLECallback());
 
   pMainCharacteristic->addDescriptor(new BLE2902());
+
+   pDebugCharacteristic = pService->createCharacteristic(
+    CHARACTERISTIC_UUID_MAIN,
+    BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+
+  pDebugCharacteristic->addDescriptor(new BLE2902());
 
   pSettingsCharacteristic = pService->createCharacteristic(
     CHARACTERISTIC_UUID_SETTINGS,
@@ -79,4 +90,6 @@ void setup() {
   tone(BUZZZER_PIN, 500, 100);
   delay(100);
   noTone(BUZZZER_PIN);
+
+  turnOffDisplayLed();
 }

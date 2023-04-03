@@ -4,8 +4,20 @@ const long linterval = 250;
 
 
 void loop() {
+  unsigned long currentTime = millis() / 1000;
+
+  // Calculate the time difference in seconds
+  unsigned long timeDifference = 2 * 60 * 60 - currentTime;  // 2 hours
+
+  if (timeDifference <= 0) {
+    // If more than 2 hours have passed, go to deep sleep
+    digitalWrite(LOCK_PIN, LOW);
+    controllerIsOn = 0;
+    esp_deep_sleep_start();
+  }
+
   unsigned long currMillis = millis();
-  byte txByte[] = { isUnlocked, unlockForEver, speed, battery, lightIsOn };
+  byte txByte[] = { isUnlocked, unlockForEver, speed, battery, throttle, lightIsOn, controllerIsOn, isCharging, alarmIsOn };
   byte settingsByte[] = { max_speed, alarm_delay, alarm_freq, alarm_reps };
 
   if (currMillis - prevMillis >= linterval) {
@@ -16,7 +28,7 @@ void loop() {
       pMainCharacteristic->setValue(txByte, sizeof(txByte));
       pMainCharacteristic->notify();
     }
-    if (isUnlocked == 1) {
+    if (controllerIsOn) {
       sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
     }
   }
