@@ -100,3 +100,5 @@ The following table shows the known meaning of the bytes in the commands send to
 | 51 | Upgrading |
 
 #### Example: `4C 42 44 43 50 01 10 11 00 09 01 31 01 1E 02 00 CD 01 00 9A`
+
+You can turn off the red LED with the following command: `4C 42 44 43 50 01 10 1B 00 08 03 00 00 00 03 00 00 00`
