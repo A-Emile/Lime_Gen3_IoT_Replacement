@@ -11,7 +11,7 @@ void readController() {
 
     if (Serial.available() == 42) {
       byte command[42];
-       Serial.readBytes(command, 42);
+      Serial.readBytes(command, 42);
 
       pDebugCharacteristic->setValue(command, sizeof(command));
       pDebugCharacteristic->notify();
@@ -25,6 +25,8 @@ void readController() {
         battery = command[19];
         throttle = command[28];
         isCharging = command[21];
+        isUnlocked = command[23] == 0xF1 ? 1 : 0;
+        lightIsOn = command[29] == 0x4D ? 1 : 0;
       }
     } else {
     }
