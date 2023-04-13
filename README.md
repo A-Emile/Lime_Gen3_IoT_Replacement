@@ -14,6 +14,8 @@ The IoT module gets replaced with an ESP32 microcontroller to enable us to contr
 ## Installation
 Install the ESP32 add-on for Arduino IDE if you doesnt have already. [Here is a tutorial](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/)
 
+Install the crc library by robtillaart from the library manager.
+
 Flash the controller with [unlocked firmware](https://cloud.scooterhacking.org/release/lime_dropbox/).
 
 Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main/LimeIoT) folder to the esp32.
