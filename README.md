@@ -6,8 +6,6 @@
 The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can controll it with our own app.
 If you find out more about the communication, please submit it here.
 
-I am currently working on the PCB and the App. As soon as I have a working prototype, I will published it here.
-
 ## How it works
 The IoT module gets replaced with an ESP32 microcontroller to enable us to control the scooter with our app. The app communicates with the ESP32 using Bluetooth Low Energy (BLE). The ESP32 replaces the function of the original IoT while also providing real-time feedback on speed, battery level, and other information.
 
