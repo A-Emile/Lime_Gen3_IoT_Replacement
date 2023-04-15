@@ -12,7 +12,7 @@ The IoT module gets replaced with an ESP32 microcontroller to enable us to contr
 ## Installation
 Install the ESP32 add-on for Arduino IDE if you doesnt have already. [Here is a tutorial](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/)
 
-Install the crc library by robtillaart from the library manager.
+Install the [crc](https://github.com/RobTillaart/CRC) library by robtillaart from the library manager.
 
 Flash the controller with [unlocked firmware](https://cloud.scooterhacking.org/release/lime_dropbox/).
 
