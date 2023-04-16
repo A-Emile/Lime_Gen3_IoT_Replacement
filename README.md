@@ -56,7 +56,7 @@ If you dont want/can use the app, you can just download a bluetooth terminal app
 | `alarm`   | let the scooter beeb (if speaker is connected ) |
 
 ## Controller Communication
-To unlock the controller, the blue wire that is connected to the IoT needs to be supplied with 3.3V, and the hex command `464316610001F1F28F` at a baudrate of 9600 needs to be send to power on the controller. After powering on, you have to send the following hearthbeat `4643110100084C494D4542494B45BE8A` every 500ms. Cutting the 3.3V supply and sending `464316610001F0E2AE` will power off the controller.
+To unlock the controller, supply 3.3V to the blue wire connected to the IoT and send the command `464316610001F1F28F` to power it on. Once powered on, send the heartbeat `4643110100084C494D4542494B45BE8A` every 500ms. To power off the controller, cut the 3.3V supply and send the command `464316610001F0E2AE`. The baudrate for all commands is `9600`.
 
 The command sent by the controller to the IoT consists of 42 bytes. The 9th byte represents the speed, and the 20th byte represents the battery level. The last two bytes of the command are a CRC-16/XMODEM checksum.
 
