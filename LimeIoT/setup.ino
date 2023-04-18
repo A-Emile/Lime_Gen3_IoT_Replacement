@@ -40,6 +40,9 @@ void setup() {
   pServer = NimBLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
   BLEService *pService = pServer->createService(SERVICE_UUID);
+  //BLEService *pOTAService = pServer->createService(SERVICE_UUID_OTA);
+  //BLEService *pESPOTAService = pServer->createService(SERRVICE_UUID_ESPOTA);
+  
 
   pMainCharacteristic = pService->createCharacteristic(
     CHARACTERISTIC_UUID_MAIN,
@@ -59,12 +62,28 @@ void setup() {
 
   pSettingsCharacteristic->setCallbacks(new SettingsBLECallback());
 
+  pVersionCharacteristic = pService->createCharacteristic(
+    CHARACTERISTIC_UUID_HW_VERSION,
+    NIMBLE_PROPERTY::READ
+    );
+    
+  pOtaCharacteristic = pService->createCharacteristic(
+    CHARACTERISTIC_UUID_FW,
+    NIMBLE_PROPERTY::NOTIFY | NIMBLE_PROPERTY::WRITE
+  );
+
+  pOtaCharacteristic->setCallbacks(new otaCallback());
+
+
+
   
 
   pService->start();
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->start();
+   uint8_t hardwareVersion[5] = {HARDWARE_VERSION_MAJOR, HARDWARE_VERSION_MINOR, SOFTWARE_VERSION_MAJOR, SOFTWARE_VERSION_MINOR, SOFTWARE_VERSION_PATCH};
+  pVersionCharacteristic->setValue((uint8_t*)hardwareVersion, 5);
   
   Serial.println("Ready!");
 
