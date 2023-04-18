@@ -1,12 +1,9 @@
 #include "CRC16.h"
 #include "CRC.h"
-#include <BLEDevice.h>
-#include <BLEUtils.h>
-#include <BLEServer.h>
-#include <BLE2902.h>
+#include <NimBLEDevice.h>
 
+//need to make these changeable and saveable
 #define SCOOTER_NAME "lme-UJEYGJA"
-const char *UPDATER_WIFI_PASSWORD = "123456789";
 const uint32_t BLE_PASSWORD = 123456789;
 
 // Set pins
@@ -15,10 +12,10 @@ const uint32_t BLE_PASSWORD = 123456789;
 const int LOCK_PIN = 12;
 #define BUZZZER_PIN 13
 
-BLEServer *pServer = NULL;
-BLECharacteristic *pMainCharacteristic;
-BLECharacteristic *pSettingsCharacteristic;
-BLECharacteristic *pDebugCharacteristic;
+NimBLEServer *pServer = NULL;
+NimBLECharacteristic *pMainCharacteristic;
+NimBLECharacteristic *pSettingsCharacteristic;
+NimBLECharacteristic *pDebugCharacteristic;
 
 
 // Display Status Codes
@@ -76,12 +73,12 @@ RTC_DATA_ATTR int bootCount = 0;
 // Display Task
 TaskHandle_t UARTTask;
 
-class MyServerCallbacks : public BLEServerCallbacks {
-  void onConnect(BLEServer *pServer) {
+class MyServerCallbacks : public NimBLEServerCallbacks {
+  void onConnect(NimBLEServer *pServer) {
     deviceConnected = true;
   };
 
-  void onDisconnect(BLEServer *pServer) {
+  void onDisconnect(NimBLEServer *pServer) {
     deviceConnected = false;
   }
 };

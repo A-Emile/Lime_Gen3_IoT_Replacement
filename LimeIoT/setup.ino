@@ -23,43 +23,49 @@ void setup() {
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
   Serial.println("Starting BLE work!");
 
-  BLEDevice::init(SCOOTER_NAME);
-  BLEDevice::setEncryptionLevel(ESP_BLE_SEC_ENCRYPT);
+  // Setup up BLE
+  NimBLEDevice::init(SCOOTER_NAME);
+  #ifdef ESP_PLATFORM
+    NimBLEDevice::setPower(ESP_PWR_LVL_P9); /** +9db */
+  #else
+    NimBLEDevice::setPower(9); /** +9db */
+  #endif
+  NimBLEDevice::setSecurityAuth(true, true, true);
+  NimBLEDevice::setSecurityPasskey(BLE_PASSWORD);
+  NimBLEDevice::setSecurityIOCap(BLE_HS_IO_DISPLAY_ONLY);
   /*
    * Required in authentication process to provide displaying and/or input passkey or yes/no butttons confirmation
    */
-  BLEDevice::setSecurityCallbacks(new MySecurity());
-  pServer = BLEDevice::createServer();
+  //!!!NimBLEDevice::NimServerCallbacks(new MySecurity());
+  pServer = NimBLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
   BLEService *pService = pServer->createService(SERVICE_UUID);
 
   pMainCharacteristic = pService->createCharacteristic(
     CHARACTERISTIC_UUID_MAIN,
-    BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+    NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
   pMainCharacteristic->setCallbacks(new MainBLECallback());
 
-  pMainCharacteristic->addDescriptor(new BLE2902());
 
    pDebugCharacteristic = pService->createCharacteristic(
     CHARACTERISTIC_UUID_MAIN,
-    BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+    NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
-  pDebugCharacteristic->addDescriptor(new BLE2902());
 
   pSettingsCharacteristic = pService->createCharacteristic(
     CHARACTERISTIC_UUID_SETTINGS,
-    BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+    NIMBLE_PROPERTY::WRITE | NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
 
   pSettingsCharacteristic->setCallbacks(new SettingsBLECallback());
 
-  pSettingsCharacteristic->addDescriptor(new BLE2902());
+  
 
   pService->start();
   BLEAdvertising *pAdvertising = pServer->getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->start();
-  esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;  //bonding with peer device after authentication
+  /*esp_ble_auth_req_t auth_req = ESP_LE_AUTH_REQ_SC_MITM_BOND;  //bonding with peer device after authentication
   esp_ble_io_cap_t iocap = ESP_IO_CAP_OUT;                     //set the IO capability to No output No input
   uint8_t key_size = 16;                                       //the key size should be 7~16 bytes
   uint8_t init_key = ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK;
@@ -73,13 +79,14 @@ void setup() {
   esp_ble_gap_set_security_param(ESP_BLE_SM_IOCAP_MODE, &iocap, sizeof(uint8_t));
   esp_ble_gap_set_security_param(ESP_BLE_SM_MAX_KEY_SIZE, &key_size, sizeof(uint8_t));
   esp_ble_gap_set_security_param(ESP_BLE_SM_ONLY_ACCEPT_SPECIFIED_SEC_AUTH, &auth_option, sizeof(uint8_t));
+  */
   //    esp_ble_gap_set_security_param(ESP_BLE_SM_OOB_SUPPORT, &oob_support, sizeof(uint8_t));
   /* If your BLE device act as a Slave, the init_key means you hope which types of key of the master should distribut to you,
     and the response key means which key you can distribut to thye Master;
     If your BLE device act as a master, the response key means you hope which types of key of the slave should distribut to you,
     and the init key means which key you can distribut to the slave. */
-  esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t));
-  esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t));
+  //esp_ble_gap_set_security_param(ESP_BLE_SM_SET_INIT_KEY, &init_key, sizeof(uint8_t));
+  //esp_ble_gap_set_security_param(ESP_BLE_SM_SET_RSP_KEY, &rsp_key, sizeof(uint8_t));
   Serial.println("Ready!");
 
   // Play ready sound
