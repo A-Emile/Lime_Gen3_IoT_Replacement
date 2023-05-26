@@ -30,15 +30,15 @@ void disconnectedBeeb() {
 }
 
 void alarmBeeb() {
+  sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
   for (int i = 0; i < alarm_reps; i++) {
     digitalWrite(LOCK_PIN, HIGH);
-    sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
     tone(BUZZZER_PIN, alarm_freq);
     delay(alarm_delay);
     noTone(BUZZZER_PIN);
-    sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
     delay(alarm_delay);
   }
+  sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
   if (controllerIsOn == 0) {
     digitalWrite(LOCK_PIN, LOW);
   }
