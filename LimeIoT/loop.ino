@@ -7,13 +7,17 @@ void loop() {
   unsigned long currentTime = millis() / 1000;
 
   // Calculate the time difference in seconds
-  unsigned long timeDifference = 2 * 60 * 60 - currentTime;  // 2 hours
+  unsigned long timeDifference = 1 * 60 * 60 - currentTime;  // 2 hours
 
-  if (timeDifference <= 0) {
-    // If more than 2 hours have passed, go to deep sleep
+ if (timeDifference <= 0) {
+    // If more than 1 hour have passed, go to deep sleep
     digitalWrite(LOCK_PIN, LOW);
     controllerIsOn = 0;
     esp_deep_sleep_start();
+  }
+  
+  if (digitalRead(SHOCK_PIN) == HIGH) {
+    alarmBeeb();
   }
 
   unsigned long currMillis = millis();
