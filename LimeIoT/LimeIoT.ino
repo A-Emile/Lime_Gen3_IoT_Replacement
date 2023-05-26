@@ -66,6 +66,8 @@ int alarm_freq = 3000;
 int alarm_reps = 15;
 int max_speed = 28;
 
+bool isSending = false;
+
 RTC_DATA_ATTR int bootCount = 0;
 
 // BLE
