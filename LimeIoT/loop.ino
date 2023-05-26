@@ -29,7 +29,9 @@ void loop() {
       pMainCharacteristic->notify();
     }
     if (controllerIsOn) {
-      sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
+      if (!isSending) {
+        sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
+      }
     }
   }
   // disconnecting
