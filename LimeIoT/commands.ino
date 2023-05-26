@@ -29,9 +29,9 @@ class MainBLECallback : public BLECharacteristicCallbacks {
         }
         sendControllerCommand(onEscByte, sizeof(onEscByte));
         isUnlocked = 1;
-        delay(500);
+        delay(300);
         sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
-        delay(100);
+        delay(300);
         lightIsOn = 1;
       }
       if (command == "on") {
