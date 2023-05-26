@@ -17,7 +17,8 @@ void setup() {
 
   //Setup sleep wakeup on Touch Pad 3 ( GPIO15 )
   touchSleepWakeUpEnable(T3,40);
-
+  //Setup sleep wakeup to shock sensor
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_14,1);
 
   Serial.begin(9600);
   Serial2.begin(115200, SERIAL_8N1, RXD2, TXD2);
