@@ -14,6 +14,7 @@ const uint32_t BLE_PASSWORD = 123456789;
 #define TXD2 17
 const int LOCK_PIN = 12;
 #define BUZZZER_PIN 13
+#define SHOCK_PIN 14
 
 BLEServer *pServer = NULL;
 BLECharacteristic *pMainCharacteristic;
