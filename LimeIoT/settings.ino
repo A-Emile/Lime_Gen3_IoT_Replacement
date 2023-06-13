@@ -19,7 +19,7 @@ class SettingsBLECallback : public BLECharacteristicCallbacks {
         alarm_reps = int(data[3]);
         break;
       case 0x03:
-        customDisplayStatus = data[0] == 0x00 ? "" : String(data[1], HEX);
+        customDisplayStatus = data[1] == 0x00 ? "" : String(data[1], HEX); // misstyped 0
         break;
       case 0x4:
         turnOffDisplayLed();
