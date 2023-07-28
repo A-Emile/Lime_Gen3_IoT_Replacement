@@ -37,7 +37,7 @@ Connect the wires:
 | Display TX       | GPIO  16  |
 | Display RX       | GPIO  17  |
 
-If you want, you can connect the speaker to `GPIO 13`. For the [pcb board](https://www.mediafire.com/file/o9cge7zdz4d485w) the speaker is `GPIO 25`.
+If you want, you can connect the speaker to `GPIO 13`. For the [pcb board](https://scootertalk.org/forum/viewtopic.php?t=5474&start=188) the speaker is `GPIO 25`.
 
 ## Usage
 You can download the app here: [App.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/App.apk)
