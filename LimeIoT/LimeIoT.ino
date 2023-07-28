@@ -1,20 +1,32 @@
-#include "CRC16.h"
-#include "CRC.h"
+#include <CRC16.h>
+#include <CRC.h>
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
 #include <BLE2902.h>
+#include <esp_sleep.h>
+#include <driver/rtc_io.h>
+#include "display.h"
 
 #define SCOOTER_NAME "lme-UJEYGJA"
 const char *UPDATER_WIFI_PASSWORD = "123456789";
 const uint32_t BLE_PASSWORD = 123456789;
 
 // Set pins
-#define RXD2 16
-#define TXD2 17
-const int LOCK_PIN = 12;
-#define BUZZZER_PIN 13
-#define SHOCK_PIN 14
+#define LED_BUILTIN 2
+#define TX0 1  // UART0 - Controller
+#define RX0 3
+#define RX1 9  // UART1 - SPI Flash (do not use)
+#define TX1 10
+#define RX2 16 // UART2 - Display
+#define TX2 17
+#define RX3 22 // UART3 - Debug
+#define TX3 23
+#define LOCK_PIN 12
+#define BUZZER_PIN 25
+#define DISPLAY_PIN GPIO_NUM_21
+#define SHOCK_PIN GPIO_NUM_14
+#define BOOT_PIN GPIO_NUM_33
 
 BLEServer *pServer = NULL;
 BLECharacteristic *pMainCharacteristic;
@@ -50,6 +62,9 @@ byte lightBlinkEscByte[9] = { 0x46, 0x43, 0x16, 0x13, 0x00, 0x01, 0x06, 0xC2, 0x
 // Status
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
+bool commandIsSending = false;
+bool isBooted = false;
+bool isIdle = false;
 uint8_t isUnlocked = 0;
 uint8_t controllerIsOn = 0;
 uint8_t lightIsOn = 0;
@@ -67,16 +82,15 @@ int alarm_freq = 3000;
 int alarm_reps = 15;
 int max_speed = 28;
 
-bool isSending = false;
+RTC_DATA_ATTR byte lastBattery = 0x00;
 
-RTC_DATA_ATTR int bootCount = 0;
+#define BUTTON_PIN_BITMASK ((1ULL << SHOCK_PIN) | (1ULL << BOOT_PIN))
 
 // BLE
 #define SERVICE_UUID "653bb0e0-1d85-46b0-9742-3b408f4cb83f"
 #define CHARACTERISTIC_UUID_MAIN "00c1acd4-f35b-4b5f-868d-36e5668d0929"
 #define CHARACTERISTIC_UUID_SETTINGS "7299b19e-7655-4c98-8cf1-69af4a65e982"
 #define CHARACTERISTIC_UUID_DEBUG "83ea7700-6ad7-4918-b1df-61031f95cf62"
-
 
 // Display Task
 TaskHandle_t UARTTask;
@@ -91,18 +105,23 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
-//UARTTaskCode: read controller and send command to display every 300ms
+// UARTTaskCode: read controller and send command to display every 300ms
 void UARTTaskCode(void *pvParameters) {
-  for (;;) {
+  while (true) {
     if (isUnlocked == 1) {
+      // todo: update sendDisplayLED() only once
+      if (!alarmIsOn) sendDisplayLED(green, blink);
       sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_DRIVING);
     } else {
       if (isCharging) {
+        if (!alarmIsOn) sendDisplayLED(yellow, blink);
         sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_CHARGING);
       } else if (deviceConnected) {
-        sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_LOCKED);
+        if (!alarmIsOn) sendDisplayLED(green, on);
+        sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_LOCKED);
       } else {
-        sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_SCAN);
+        if (!alarmIsOn) sendDisplayLED(green, on);
+        sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_SCAN);
       }
     }
     delay(300);

@@ -25,6 +25,7 @@ class MySecurity : public BLESecurityCallbacks
   void onAuthenticationComplete(esp_ble_auth_cmpl_t cmpl)
   {
     ESP_LOGI(LOG_TAG, "Starting BLE work!");
-    connectedBeeb();
+    playMP3("/connected.mp3");
+    delay(100);
   }
 };

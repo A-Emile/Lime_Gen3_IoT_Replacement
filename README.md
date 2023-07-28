@@ -19,7 +19,7 @@ Flash the controller with [unlocked firmware](https://cloud.scooterhacking.org/r
 Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main/LimeIoT) folder to the esp32.
 
 
-<b>Note:</b> The controller gives you 36v. So you have to convert it to stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
+<b>Note:</b> The controller gives you 42v. So you have to convert it to stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
 
 Connect the wires:
 
@@ -30,14 +30,14 @@ Connect the wires:
 | Controller lock  | GPIO 12   |
 | Controller RX    | GPIO 1    |
 | Controller TX    | GPIO 3    |
-| Controller 36v   | Buck converter -> ams1117 -> 5V |
+| Controller 42v   | Buck converter -> ams1117 -> 5V |
 | Controller Gnd   | Gnd       |
 | Display 5v       | 5V        |
 | Display Gnd      | Gnd       |
 | Display TX       | GPIO  16  |
 | Display RX       | GPIO  17  |
 
-If you want, you can connect the speaker to `GPIO 13`.
+If you want, you can connect the speaker to `GPIO 13`. For the [pcb board](https://www.mediafire.com/file/o9cge7zdz4d485w) the speaker is `GPIO 25`.
 
 ## Usage
 You can download the app here: [App.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/App.apk)
@@ -77,7 +77,7 @@ The following table shows the known meaning of the bytes in the commands send to
 | Byte | Meaning |
 |--|--|
 | 12 | Status (see below) |
-| 14 | Batttery |
+| 14 | Battery |
 | 16-17 | Speed |
 | last byte | checksum |
 
@@ -99,6 +99,25 @@ The following table shows the known meaning of the bytes in the commands send to
 | 45 | Driving Max Speed |
 | 51 | Upgrading |
 
-#### Example: `4C 42 44 43 50 01 10 11 00 09 01 31 01 1E 02 00 CD 01 00 9A`
+#### Example: `4C 42 44 43 50 01 10 11 00 09 01 31 01 1E 02 00 CD 01 9A`
+
+
+## LED Communication
 
 You can turn off the red LED with the following command: `4C 42 44 43 50 01 10 1B 00 08 03 00 00 00 03 00 00 00`
+
+| Byte | Meaning |
+|--|--|
+| 12 | red |
+| 13 | yellow |
+| 14 | green |
+
+
+#### LED Bits:
+| Bits | State |
+|--|--|
+| 00 | off |
+| 01 | on |
+| 11 | blink |
+
+LED byte has two bits = bit for blink + bit for power

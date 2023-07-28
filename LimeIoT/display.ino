@@ -10,19 +10,6 @@ const uint8_t crc_xorout = 0x00;
 const uint8_t crc_check = 0xc1;
 const uint8_t crc_residue = 0x00;
 
-
-// Currently I only know how to turn off the LED
-void turnOffDisplayLed() {
-  byte myByte[19] = { 0x4C, 0x42, 0x44, 0x43, 0x50, 0x01, 0x10, 0x1B, 0x00, 0x08, 0x03, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00 };
-  byte checksum = crc8(myByte, sizeof(myByte), crc_poly, crc_init, crc_xorout, crc_refin, crc_refout);
-  myByte[18] = checksum;
-  delay(300);
-  for (int i = 0; i < sizeof(myByte); i += 1) {
-    Serial2.write(myByte[i]);
-  }
-  delay(300);
-}
-
 void sendDisplayCommand(int speed, byte battery, String status) {
   speed = (speed / 50.0) * 500.0;
   String SPEED_HEX = String(speed, HEX);
@@ -52,6 +39,22 @@ void sendDisplayCommand(int speed, byte battery, String status) {
   // Concatenate input hex string and CRC8 checksum
   String output_str = input_str + String(crc_value, HEX);
   // Convert concatenated string to bytes and send to display
+  for (int i = 0; i < output_str.length(); i += 2) {
+    uint8_t byte = strtoul(output_str.substring(i, i + 2).c_str(), NULL, 16);
+    Serial2.write(byte);
+  }
+}
+
+void sendDisplayLED(LEDbytePosition pos, LEDstate state) {
+  String input_str = "4C4244435001101B00080300000003000000";
+  sprintf(&input_str[pos * 2 - 2], "%02X", state);
+  int input_len = input_str.length();
+  uint8_t input_bytes[input_len / 2];
+  for (int i = 0; i < input_len; i += 2) {
+    input_bytes[i / 2] = strtoul(input_str.substring(i, i + 2).c_str(), NULL, 16);
+  }
+  uint8_t crc_value = crc8(input_bytes, input_len / 2, crc_poly, crc_init, crc_xorout, crc_refin, crc_refout);
+  String output_str = input_str + String(crc_value, HEX);
   for (int i = 0; i < output_str.length(); i += 2) {
     uint8_t byte = strtoul(output_str.substring(i, i + 2).c_str(), NULL, 16);
     Serial2.write(byte);
