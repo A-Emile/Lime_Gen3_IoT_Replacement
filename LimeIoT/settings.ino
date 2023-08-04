@@ -20,6 +20,7 @@ class SettingsBLECallback : public BLECharacteristicCallbacks {
         customDisplayStatus = data[1] == 0x00 ? "" : String(data[1], HEX);
         break;
       case 0x4:
+        LEDmode = 0x00;
         sendDisplayLED(green, off);
         break;
       case 0x46:

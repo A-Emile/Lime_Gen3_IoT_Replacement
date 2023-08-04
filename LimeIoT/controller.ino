@@ -37,5 +37,12 @@ void readController() {
 }
 
 void sendControllerCommand(byte* cmd, size_t len) {
+  static bool isSending = 0;
+  while (isSending) {
+    delay(100);
+  }
+  isSending = 1;
   Serial1.write(cmd, len);
+  delay(500);
+  isSending = 0;
 }

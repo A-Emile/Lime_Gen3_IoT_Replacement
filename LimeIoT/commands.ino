@@ -53,7 +53,7 @@ class MainBLECallback : public BLECharacteristicCallbacks {
       if (command == "reboot") {
         lockScooter();
         turnOffController();
-        esp_deep_sleep_start();
+        ESP.restart();
       }
       commandIsSending = false;
     }

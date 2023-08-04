@@ -45,9 +45,9 @@ void sendDisplayCommand(int speed, byte battery, String status) {
   }
 }
 
-void sendDisplayLED(LEDbytePosition pos, LEDstate state) {
+void sendDisplayLED(LEDbyteOffset offset, LEDstate state) {
   String input_str = "4C4244435001101B00080300000003000000";
-  sprintf(&input_str[pos * 2 - 2], "%02X", state);
+  sprintf(&input_str[offset * 2 - 2], "%02X", state);
   int input_len = input_str.length();
   uint8_t input_bytes[input_len / 2];
   for (int i = 0; i < input_len; i += 2) {

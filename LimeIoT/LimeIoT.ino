@@ -28,6 +28,11 @@ const uint32_t BLE_PASSWORD = 123456789;
 #define SHOCK_PIN GPIO_NUM_14
 #define BOOT_PIN GPIO_NUM_33
 
+// Adafruit I2S Amplifier MAX98357A
+#define WCLK_PIN 25
+#define BCLK_PIN 26
+#define DOUT_PIN 27
+
 BLEServer *pServer = NULL;
 BLECharacteristic *pMainCharacteristic;
 BLECharacteristic *pSettingsCharacteristic;
@@ -62,7 +67,9 @@ byte lightBlinkEscByte[9] = { 0x46, 0x43, 0x16, 0x13, 0x00, 0x01, 0x06, 0xC2, 0x
 // Status
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
+bool isDisconnected = false;
 bool commandIsSending = false;
+bool isMP3Playing = false;
 bool isBooted = false;
 bool isIdle = false;
 uint8_t isUnlocked = 0;
@@ -72,6 +79,7 @@ uint8_t unlockForEver = 0;
 float speed = 0;
 uint8_t alarmIsOn = 0;
 uint8_t throttle = 1;
+byte LEDmode = 0x00;
 byte battery = 0x00;
 byte isCharging = 0x00;
 String customDisplayStatus = "";
@@ -81,10 +89,11 @@ int alarm_delay = 200;
 int alarm_freq = 3000;
 int alarm_reps = 15;
 int max_speed = 28;
-
+RTC_DATA_ATTR byte alarm_cnt = 0;
 RTC_DATA_ATTR byte lastBattery = 0x00;
 
-#define BUTTON_PIN_BITMASK ((1ULL << SHOCK_PIN) | (1ULL << BOOT_PIN))
+//#define BUTTON_PIN_BITMASK ((1ULL << SHOCK_PIN) | (1ULL << BOOT_PIN))
+#define BUTTON_PIN_BITMASK (1ULL << BOOT_PIN)
 
 // BLE
 #define SERVICE_UUID "653bb0e0-1d85-46b0-9742-3b408f4cb83f"
@@ -108,19 +117,39 @@ class MyServerCallbacks : public BLEServerCallbacks {
 // UARTTaskCode: read controller and send command to display every 300ms
 void UARTTaskCode(void *pvParameters) {
   while (true) {
+    // reset ESP32 once a week
+    if (millis() > 600000000) {
+      ESP.restart();
+    }
     if (isUnlocked == 1) {
-      // todo: update sendDisplayLED() only once
-      if (!alarmIsOn) sendDisplayLED(green, blink);
+      if (LEDmode != 0x03 && !alarmIsOn) {
+        LEDmode = (LEDmode == 0xC3) ? 0x03 : 0xC3;
+        sendDisplayLED(green, blink);
+      }
       sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_DRIVING);
     } else {
       if (isCharging) {
-        if (!alarmIsOn) sendDisplayLED(yellow, blink);
+        if (battery < 100) {
+          if (LEDmode != 0x0C && !alarmIsOn) {
+            LEDmode = (LEDmode == 0xCC) ? 0x0C : 0xCC;
+            sendDisplayLED(yellow, blink);
+          }
+        } else if (LEDmode != 0x03 && !alarmIsOn) {
+            LEDmode = (LEDmode == 0xC3) ? 0x03 : 0xC3;
+            sendDisplayLED(green, blink);
+        }
         sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_CHARGING);
       } else if (deviceConnected) {
-        if (!alarmIsOn) sendDisplayLED(green, on);
+        if (LEDmode != 0x01 && !alarmIsOn) {
+          LEDmode = (LEDmode == 0xC1) ? 0x01 : 0xC1;
+          sendDisplayLED(green, on);
+        }
         sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_LOCKED);
       } else {
-        if (!alarmIsOn) sendDisplayLED(green, on);
+        if (LEDmode != 0x01 && !alarmIsOn) {
+          LEDmode = (LEDmode == 0xC1) ? 0x01 : 0xC1;
+          sendDisplayLED(green, on);
+        }
         sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_SCAN);
       }
     }

@@ -2,12 +2,16 @@ unsigned long prevMillis = 0;
 const long linterval = 250;
 
 unsigned long lastOnTime = 0;
-const long sleepTimer = 3600; // 1 hour
+const unsigned short sleepTimer = 3 * 60 * 60; // 3 hours
+
+// inhibit driving without hearthbeat timeout
+unsigned long lastConnected = 0;
+const unsigned short lockTimer = 3 * 60 ; // 3 minutes
 
 void loop() {
   unsigned long currentTime = millis() / 1000;
 
-  // If more than 1 hours have passed, go to deep sleep
+  // If more than 3 hours have passed, go to deep sleep
   if ((currentTime - lastOnTime) > sleepTimer) {
     lockScooter();
     turnOffController();
@@ -21,23 +25,31 @@ void loop() {
   else if (isUnlocked || isCharging) {
     lastOnTime = currentTime;
   }
-
+/*
   // wake on shock sensor
-  if (digitalRead(SHOCK_PIN) == HIGH && !alarmIsOn && !isUnlocked && !unlockForEver) {
+  if (digitalRead(SHOCK_PIN) == HIGH && !alarmIsOn && !deviceConnected && !isUnlocked && !unlockForEver) {
     digitalWrite(DISPLAY_PIN, LOW);
     alarmBeeb();
+    alarm_cnt++; // avoid disorderly conduct in night mode
+    lastOnTime = currentTime;
   }
-
+*/
   // wake on charger (decrease idle time with pull-down resistor)
   getPin(BOOT_PIN, &isBooted, 5);
-  if (isBooted && !controllerIsOn && !isIdle) {
-    digitalWrite(DISPLAY_PIN, LOW);
-    lastOnTime = currentTime;
-    turnOnController();
+  if (isBooted || (currentTime == 10) || (currentTime % 80000 == 0)) {
+    if (!controllerIsOn && !isIdle) { // update battery once a day
+      digitalWrite(DISPLAY_PIN, LOW);
+      lastOnTime = currentTime;
+      turnOnController();
+    }
+  }
+  // lock on charging
+  if (isUnlocked && isCharging && !unlockForEver && !commandIsSending && !alarmIsOn && !isMP3Playing) {
+    playMP3("/lock.mp3");
     lockScooter();
   }
   // turn off on charging idle
-  if (!isIdle && controllerIsOn && !alarmIsOn && !deviceConnected && (currentTime - lastOnTime) > 5) {
+  if (!isIdle && controllerIsOn && !alarmIsOn && !deviceConnected && !unlockForEver && (currentTime - lastOnTime) > 30) {
     lockScooter();
     turnOffController();
   }
@@ -56,16 +68,19 @@ void loop() {
       pSettingsCharacteristic->setValue(settingsByte, sizeof(txByte));
       pMainCharacteristic->setValue(txByte, sizeof(txByte));
       pMainCharacteristic->notify();
-    }
-    if (controllerIsOn) {
-      if (!commandIsSending) {
+    } else if (isUnlocked && !unlockForEver && (currentTime - lastConnected > lockTimer)) {
+        lockScooter();
+      }
+    if (controllerIsOn && !commandIsSending) {
+      if (deviceConnected || unlockForEver) {
         sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
+        lastConnected = currentTime;
       }
     }
   }
   // disconnecting
   if (!deviceConnected && oldDeviceConnected) {
-    if (unlockForEver == 0) {
+    if (!unlockForEver && !isCharging) {
       turnOffController();
     }
     playMP3("/disconnected.mp3");

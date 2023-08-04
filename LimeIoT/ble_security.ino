@@ -27,5 +27,6 @@ class MySecurity : public BLESecurityCallbacks
     ESP_LOGI(LOG_TAG, "Starting BLE work!");
     playMP3("/connected.mp3");
     delay(100);
+    alarm_cnt = 0;   // disable night mode
   }
 };

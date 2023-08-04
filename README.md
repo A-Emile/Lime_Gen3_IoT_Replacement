@@ -32,12 +32,15 @@ Connect the wires:
 | Controller TX    | GPIO 3    |
 | Controller 42v   | Buck converter -> ams1117 -> 5V |
 | Controller Gnd   | Gnd       |
+| Controller Charge (2) | GPIO 33 |
 | Display 5v       | 5V        |
 | Display Gnd      | Gnd       |
-| Display TX       | GPIO  16  |
-| Display RX       | GPIO  17  |
+| Display TX       | GPIO 16   |
+| Display RX       | GPIO 17   |
 
-If you want, you can connect the speaker to `GPIO 13`. For the [pcb board](https://scootertalk.org/forum/viewtopic.php?t=5474&start=188) the speaker is `GPIO 25`.
+(Optional) If you want, you can connect the speaker to `GPIO 13` with a base resistor and transistor. For the [pcb board](https://scootertalk.org/forum/viewtopic.php?t=5474&start=188) the speaker is `GPIO 25`. For more gain connect Adafruit I2S Amplifier [MAX98357A](https://www.adafruit.com/product/3006) DIN `GPIO 27` BCLK `GPIO 26` LRCLK `GPIO 25`.
+
+(Optional) You can connect any alarm sensor to `GPIO 14` max input voltage 4.6v (!)
 
 ## Usage
 You can download the app here: [App.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/App.apk)

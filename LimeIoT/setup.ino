@@ -2,13 +2,13 @@ void setup() {
 
   // create a task that will be executed along the loop() function, with priority 2 and executed on core 0
   xTaskCreatePinnedToCore(
-    UARTTaskCode,  /* Task function. */
-    "DisplayTask", /* name of task. */
-    8192,          /* Stack size of task */
-    NULL,          /* parameter of the task */
-    2,             /* priority of the task */
-    &UARTTask,     /* Task handle to keep track of created task */
-    0);            /* pin task to core 0 */
+    UARTTaskCode,  // Task function.
+    "DisplayTask", // name of task.
+    4096,          // Stack size of task
+    NULL,          // parameter of the task
+    2,             // priority of the task
+    &UARTTask,     // Task handle to keep track of created task
+    0);            // pin task to core 1
 
   // ESP32 onboard LED
   pinMode(LED_BUILTIN,OUTPUT);
@@ -22,7 +22,12 @@ void setup() {
   pinMode(DISPLAY_PIN, OUTPUT);
   digitalWrite(DISPLAY_PIN, LOW);
 //  gpio_hold_en(DISPLAY_PIN);
-
+/*
+  //Setup sleep wakeup on Touch Pad 3 ( GPIO15 )
+  touchSleepWakeUpEnable(T3,40);
+  //Setup sleep wakeup to shock sensor
+  esp_sleep_enable_ext0_wakeup(GPIO_NUM_14,1);
+*/
   // wake on shock sensor
   pinMode(SHOCK_PIN, INPUT_PULLDOWN);
 //  rtc_gpio_deinit(SHOCK_PIN);
@@ -115,6 +120,13 @@ void setup() {
   tone(BUZZER_PIN, 500, 100);
   delay(100);
   noTone(BUZZER_PIN);
+/*
+  beep(300, 100);
+  beep(400, 100);
+  beep(500, 100);
+*/
+  LEDmode = 0x00;
+  sendDisplayLED(red, off);
 
   // disable AudioLogger
   Print* audioLogger = &silencedLogger;
