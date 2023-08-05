@@ -25,18 +25,25 @@ void loop() {
   else if (isUnlocked || isCharging) {
     lastOnTime = currentTime;
   }
+  // arm the alarm on shock sensor
+  if (isDisconnected && (currentTime - lastConnected) > lockTimer && (currentTime - lastOnTime) > lockTimer) {
+    isDisconnected = false;
+  }
 /*
   // wake on shock sensor
-  if (digitalRead(SHOCK_PIN) == HIGH && !alarmIsOn && !deviceConnected && !isUnlocked && !unlockForEver) {
+  if (digitalRead(SHOCK_PIN) == HIGH && !alarmIsOn && !deviceConnected && !isDisconnected && !isUnlocked && !unlockForEver) {
     digitalWrite(DISPLAY_PIN, LOW);
+    lastOnTime = currentTime;
+    isIdle = false;
     alarmBeeb();
     alarm_cnt++; // avoid disorderly conduct in night mode
     lastOnTime = currentTime;
+    isIdle = false;
   }
 */
   // wake on charger (decrease idle time with pull-down resistor)
   getPin(BOOT_PIN, &isBooted, 5);
-  if (isBooted || (currentTime == 10) || (currentTime % 80000 == 0)) {
+  if (isBooted || (currentTime % 80000 == 0)) {
     if (!controllerIsOn && !isIdle) { // update battery once a day
       digitalWrite(DISPLAY_PIN, LOW);
       lastOnTime = currentTime;
@@ -88,6 +95,7 @@ void loop() {
     pServer->startAdvertising();  // restart advertising
     Serial.println("start advertising");
     oldDeviceConnected = deviceConnected;
+    isDisconnected = true;
   }
   // connecting
   if (deviceConnected && !oldDeviceConnected) {

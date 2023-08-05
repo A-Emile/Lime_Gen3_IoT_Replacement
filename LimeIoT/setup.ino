@@ -8,7 +8,7 @@ void setup() {
     NULL,          // parameter of the task
     2,             // priority of the task
     &UARTTask,     // Task handle to keep track of created task
-    0);            // pin task to core 1
+    0);            // pin task to core 0
 
   // ESP32 onboard LED
   pinMode(LED_BUILTIN,OUTPUT);
@@ -125,9 +125,8 @@ void setup() {
   beep(400, 100);
   beep(500, 100);
 */
-  LEDmode = 0x00;
-  sendDisplayLED(red, off);
-
   // disable AudioLogger
   Print* audioLogger = &silencedLogger;
+
+  turnOnController();
 }

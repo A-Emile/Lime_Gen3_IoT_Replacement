@@ -121,10 +121,11 @@ void UARTTaskCode(void *pvParameters) {
     if (millis() > 600000000) {
       ESP.restart();
     }
-    if (isUnlocked == 1) {
+    if (isUnlocked) {
       if (LEDmode != 0x03 && !alarmIsOn) {
         LEDmode = (LEDmode == 0xC3) ? 0x03 : 0xC3;
         sendDisplayLED(green, blink);
+        delay(300);
       }
       sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_DRIVING);
     } else {
@@ -133,25 +134,33 @@ void UARTTaskCode(void *pvParameters) {
           if (LEDmode != 0x0C && !alarmIsOn) {
             LEDmode = (LEDmode == 0xCC) ? 0x0C : 0xCC;
             sendDisplayLED(yellow, blink);
+            delay(300);
           }
         } else if (LEDmode != 0x03 && !alarmIsOn) {
             LEDmode = (LEDmode == 0xC3) ? 0x03 : 0xC3;
             sendDisplayLED(green, blink);
+            delay(300);
         }
         sendDisplayCommand(speed, battery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_CHARGING);
       } else if (deviceConnected) {
-        if (LEDmode != 0x01 && !alarmIsOn) {
-          LEDmode = (LEDmode == 0xC1) ? 0x01 : 0xC1;
-          sendDisplayLED(green, on);
+          if (LEDmode != 0x01 && !alarmIsOn) {
+            LEDmode = (LEDmode == 0xC1) ? 0x01 : 0xC1;
+            sendDisplayLED(green, on);
+            delay(300);
         }
         sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_LOCKED);
       } else {
-        if (LEDmode != 0x01 && !alarmIsOn) {
-          LEDmode = (LEDmode == 0xC1) ? 0x01 : 0xC1;
-          sendDisplayLED(green, on);
+          if (LEDmode != 0x01 && !alarmIsOn) {
+            LEDmode = (LEDmode == 0xC1) ? 0x01 : 0xC1;
+            sendDisplayLED(green, on);
+            delay(300);
         }
         sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_SCAN);
       }
+    }
+    if (!battery) {
+      LEDmode = 0x04;
+      sendDisplayLED(yellow, on);
     }
     delay(300);
   }
