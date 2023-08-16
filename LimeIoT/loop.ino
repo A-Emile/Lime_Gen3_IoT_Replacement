@@ -10,19 +10,20 @@ const unsigned short lockTimer = 3 * 60 ; // 3 minutes
 
 void loop() {
   unsigned long currentTime = millis() / 1000;
-
+/*
   // If more than 3 hours have passed, go to deep sleep
   if ((currentTime - lastOnTime) > sleepTimer) {
     lockScooter();
     turnOffController();
-//    digitalWrite(DISPLAY_PIN, HIGH);
+    digitalWrite(DISPLAY_PIN, HIGH);
     // wait for BOOT_PIN state was updated
-    if (!isBooted) {
+    if (!isBooted || (currentTime - lastOnTime) > sleepTimer + 30) {
       lastOnTime = currentTime;
-//      esp_deep_sleep_start();
+      esp_deep_sleep_start();
     }
   }
-  else if (isUnlocked || isCharging) {
+*/
+  if (isUnlocked || isCharging) {
     lastOnTime = currentTime;
   }
   // arm the alarm on shock sensor
@@ -33,11 +34,9 @@ void loop() {
   // wake on shock sensor
   if (digitalRead(SHOCK_PIN) == HIGH && !alarmIsOn && !deviceConnected && !isDisconnected && !isUnlocked && !unlockForEver) {
     digitalWrite(DISPLAY_PIN, LOW);
-    lastOnTime = currentTime;
-    isIdle = false;
     alarmBeeb();
     alarm_cnt++; // avoid disorderly conduct in night mode
-    lastOnTime = currentTime;
+    lastOnTime = millis() / 1000;
     isIdle = false;
   }
 */

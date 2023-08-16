@@ -50,7 +50,7 @@ void alarmBeeb() {
     delay(1500);
   }
   // avoid disorderly conduct in night mode
-  if (alarm_cnt <= 10) {
+  if (alarm_cnt < 10) {
     playMP3("/alarm.mp3");
     sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
     for (int i = 0; i < alarm_reps; i++) {
@@ -71,6 +71,6 @@ void alarmBeeb() {
       sendDisplayLED(red, off);
       delay(alarm_delay);
     }
-  } else delay((4 * alarm_delay * alarm_reps) + 1000); // debounce GPIO input
+  } else delay((4UL * alarm_delay * alarm_reps) + 1000); // debounce GPIO input
   alarmIsOn = 0;
 }
