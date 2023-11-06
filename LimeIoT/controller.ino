@@ -9,29 +9,63 @@ void readController() {
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
 
-    if (Serial1.available() == 42) {
-      byte command[42];
-      Serial1.readBytes(command, 42);
+    while (Serial1.available() > 0 && Serial1.peek() != 0x46) {
+      if (millis() - previousMillis >= interval) {
+        return;
+      }
+      Serial1.read();
+    }
 
-      pDebugCharacteristic->setValue(command, sizeof(command));
-      pDebugCharacteristic->notify();
+    byte command[44];
+    if (Serial1.available() >= 6) {
+      for (int i = 0; i < 6; i++) {
+        command[i] = Serial1.read();
+      }
+      if (command[4] == 0x00) {
 
-      uint16_t new_checksum = crc16(command, sizeof(command) - 2, 0x1021, 0x0000, 0x0000, false, false);
-      uint16_t old_checksum = (uint16_t(command[40]) << 8) | uint16_t(command[41]);  // get a pointer to the last two bytes of the command array and interpret them as a uint16_t
+        int msgLen = command[5];
+        uint32_t id = (uint32_t(command[0]) << 24) |
+                      (uint32_t(command[1]) << 16) |
+                      (uint32_t(command[2]) <<  8) |
+                       uint32_t(command[3]);
 
-      // Check if the command has correct checksum
-      if (old_checksum == new_checksum) {
-        speed = (command[8] / 172.0) * max_speed;
-        battery = command[19];
-        throttle = command[28];
-        isCharging = command[21];
-        isUnlocked = command[23] == 0xF1 ? 1 : 0;
-        lightIsOn = command[29] == 0x4D ? 1 : 0;
-        lastBattery = battery;
+        if (msgLen <= 0x24 && Serial1.available() >= msgLen + 2) {
+          for (int i = 0; i < msgLen + 2; i++) {
+            command[i+6] = Serial1.read();
+          }
+          for (int i = msgLen + 8; i < 44; i++) {
+            command[i] = 0;
+          }
+        }
+
+        pDebugCharacteristic->setValue(command, msgLen + 2);
+        pDebugCharacteristic->notify();
+
+        uint16_t new_checksum = crc16(command, msgLen + 6, 0x1021, 0x0000, 0x0000, false, false);
+        uint16_t old_checksum = (uint16_t(command[msgLen + 6]) << 8) | uint16_t(command[msgLen + 7]);
+
+        // Check if the command has correct checksum
+        if (old_checksum == new_checksum) {
+          switch (id) {
+            case 0x46580CFF:
+              speed = (max_speed == 20) ? command[8] * max_speed / 119 : command[8] * max_speed / 172;
+              battery = command[19];
+              throttle = command[28];
+              isCharging = command[21];
+              isUnlocked = command[23] & 0x01;
+              lightIsOn = command[29] & 0x01;
+              if (battery) {
+                lastBattery = battery;
+              } else {
+                  lastBattery = 1;
+                }
+              break;
+          }
+        }
       }
     }
     while (Serial1.available() > 0) {
-      char t = Serial1.read();
+      Serial1.read();
     }
   }
 }
