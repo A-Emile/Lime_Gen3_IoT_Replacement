@@ -16,6 +16,7 @@ void loop() {
     lockScooter();
     turnOffController();
     digitalWrite(DISPLAY_PIN, HIGH);
+//    digitalWrite(DISPLAY_PIN, LOW);
     // wait for BOOT_PIN state was updated
     if (!isBooted || (currentTime - lastOnTime) > sleepTimer + 30) {
       lastOnTime = currentTime;
@@ -33,10 +34,13 @@ void loop() {
 /*
   // wake on shock sensor
   if (digitalRead(SHOCK_PIN) == HIGH && !alarmIsOn && !deviceConnected && !isDisconnected && !isUnlocked && !unlockForEver) {
+//  if (analogReadMilliVolts(SHOCK_PIN) > 700 && !alarmIsOn && !deviceConnected && !isDisconnected && !isUnlocked && !unlockForEver) {
     digitalWrite(DISPLAY_PIN, LOW);
+//    digitalWrite(DISPLAY_PIN, HIGH);
     alarmBeeb();
     alarm_cnt++; // avoid disorderly conduct in night mode
-    lastOnTime = millis() / 1000;
+    currentTime = millis() / 1000;
+    lastOnTime = currentTime;
     isIdle = false;
   }
 */
@@ -45,6 +49,7 @@ void loop() {
   if (isBooted || (currentTime % 80000 == 0)) {
     if (!controllerIsOn && !isIdle) { // update battery once a day
       digitalWrite(DISPLAY_PIN, LOW);
+//      digitalWrite(DISPLAY_PIN, HIGH);
       lastOnTime = currentTime;
       turnOnController();
     }
@@ -64,8 +69,8 @@ void loop() {
   }
 
   unsigned long currMillis = millis();
-  byte txByte[] = { isUnlocked, unlockForEver, speed, battery, throttle, lightIsOn, controllerIsOn, isCharging, alarmIsOn };
-  byte settingsByte[] = { max_speed, alarm_delay, alarm_freq, alarm_reps };
+  byte txByte[] = { isUnlocked, unlockForEver, (byte)speed, battery, throttle, lightIsOn, controllerIsOn, isCharging, alarmIsOn };
+  byte settingsByte[] = { (byte)max_speed, (byte)alarm_delay, (byte)alarm_freq, (byte)alarm_reps };
 
   if (currMillis - prevMillis >= linterval) {
     prevMillis = currMillis;  // update prevMillis with current time
@@ -78,8 +83,8 @@ void loop() {
         lockScooter();
       }
     if (controllerIsOn && !commandIsSending) {
+      sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
       if (deviceConnected || unlockForEver) {
-        sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
         lastConnected = currentTime;
       }
     }

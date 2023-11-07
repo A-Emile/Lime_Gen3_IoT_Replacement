@@ -20,18 +20,20 @@ const uint32_t BLE_PASSWORD = 123456789;
 #define TX1 10
 #define RX2 16 // UART2 - Display
 #define TX2 17
+// RX2 17 = ESP32-DevKitC V2, RX2 4 = WeMos D32 / Pro, RX2 5 = WeMos Lolin32, RX2 2 = WeMos Lolin32 Pro (32 pin)
+// TX2 5 = ESP32-DevKitC V2, ** WeMos D32 / Pro, TX2 18 = WeMos Lolin32, TX2 0 = WeMos Lolin32 Pro (32 pin)
 #define RX3 22 // UART3 - Debug
 #define TX3 23
-#define LOCK_PIN 12
-#define BUZZER_PIN 25
+#define LOCK_PIN 12 // 13 = WeMos D32 / Pro
+#define BUZZER_PIN 25 // 26 = WeMos D32 / Pro
 #define DISPLAY_PIN GPIO_NUM_21
-#define SHOCK_PIN GPIO_NUM_14
-#define BOOT_PIN GPIO_NUM_33
+#define SHOCK_PIN GPIO_NUM_14 // GPIO_NUM_12 = WeMos D32 / Pro
+#define BOOT_PIN GPIO_NUM_33 // GPIO_NUM_25 = WeMos D32 / Pro, GPIO_NUM_35 = WeMos Lolin32
 
 // Adafruit I2S Amplifier MAX98357A
-#define WCLK_PIN 25
-#define BCLK_PIN 26
-#define DOUT_PIN 27
+#define WCLK_PIN 25 // 26 = WeMos D32 / Pro
+#define BCLK_PIN 26 // 27 = WeMos D32 / Pro
+#define DOUT_PIN 27 // 14 = WeMos D32 / Pro
 
 BLEServer *pServer = NULL;
 BLECharacteristic *pMainCharacteristic;
@@ -76,10 +78,10 @@ uint8_t isUnlocked = 0;
 uint8_t controllerIsOn = 0;
 uint8_t lightIsOn = 0;
 uint8_t unlockForEver = 0;
-float speed = 0;
+int speed = 0;
 uint8_t alarmIsOn = 0;
 uint8_t throttle = 1;
-byte LEDmode = 0x00;
+byte LEDmode = 0x10;
 byte battery = 0x00;
 byte isCharging = 0x00;
 String customDisplayStatus = "";
@@ -150,18 +152,27 @@ void UARTTaskCode(void *pvParameters) {
         }
         sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_LOCKED);
       } else {
+/*
           if (LEDmode != 0x01 && !alarmIsOn) {
             LEDmode = (LEDmode == 0xC1) ? 0x01 : 0xC1;
             sendDisplayLED(green, on);
             delay(300);
         }
+*/
+          if (LEDmode != 0x00 && !alarmIsOn) {
+            LEDmode = (LEDmode == 0xC0) ? 0x00 : 0xC0;
+            sendDisplayLED(green, off);
+            delay(300);
+        }
         sendDisplayCommand(speed, battery != 0x00 ? battery : lastBattery, customDisplayStatus != "" ? customDisplayStatus : DISPLAY_STATUS_SCAN);
       }
     }
-    if (!battery) {
+/*
+    if (!battery && !alarmIsOn) {
       LEDmode = 0x04;
       sendDisplayLED(yellow, on);
     }
+*/
     delay(300);
   }
 }

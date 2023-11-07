@@ -3,14 +3,14 @@
 
 ![cover](https://raw.githubusercontent.com/A-Emile/Lime_Gen3_IoT_Replacement/main/iot_original.png)
 
-The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can controll it with our own app.
+The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can control it with our own app.
 If you find out more about the communication, please submit it here.
 
 ## How it works
 The IoT module gets replaced with an ESP32 microcontroller to enable us to control the scooter with our app. The app communicates with the ESP32 using Bluetooth Low Energy (BLE). The ESP32 replaces the function of the original IoT while also providing real-time feedback on speed, battery level, and other information.
 
 ## Installation
-Install the ESP32 add-on for Arduino IDE if you doesnt have already. [Here is a tutorial](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/) The Sketch is created with Arduino 1.8.19 for board platform esp32 by Espressif Systems version 2.0.13. Downgrade version to avoid exceeding of program storage space. Maximum is 1310720 bytes.
+Install the ESP32 add-on for Arduino IDE if you doesnt have already. [Here is a tutorial](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/). The Sketch is created with Arduino 1.8.19 for board platform esp32 by Espressif Systems version 2.0.13. Downgrade version to avoid exceeding of program storage space. Maximum is 1310720 bytes.
 
 Install the [crc](https://github.com/RobTillaart/CRC) library by robtillaart from the library manager.
 

@@ -29,7 +29,7 @@ class SettingsBLECallback : public BLECharacteristicCallbacks {
         }
         break;
     }
-    byte settingsByte[] = { max_speed, alarm_delay, alarm_freq, alarm_reps };
+	byte settingsByte[] = { (byte)max_speed, (byte)alarm_delay, (byte)alarm_freq, (byte)alarm_reps };
     pSettingsCharacteristic->setValue(settingsByte, sizeof(settingsByte));
     pSettingsCharacteristic->notify();
   }

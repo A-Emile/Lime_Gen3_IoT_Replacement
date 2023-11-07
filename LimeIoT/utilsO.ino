@@ -49,7 +49,9 @@ void getPin(gpio_num_t pin, bool* state, const unsigned long dur) {
   else {
     lastRead = cur;
   }
+
   if (digitalRead(pin) == HIGH) {
+//  if (analogReadMilliVolts(pin) > 700) {
     if (!high) {
       lastHigh = cur;
       high = true;

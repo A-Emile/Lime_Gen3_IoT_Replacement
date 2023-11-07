@@ -18,9 +18,11 @@ void setup() {
   digitalWrite(LOCK_PIN, LOW);
   controllerIsOn = 0;
 
-  // Display LOW = on, HIGH = off
+  // Display LOW = off, HIGH = on for npn transistor
+  // Display LOW = on, HIGH = off for pnp transistor
   pinMode(DISPLAY_PIN, OUTPUT);
   digitalWrite(DISPLAY_PIN, LOW);
+//  digitalWrite(DISPLAY_PIN, HIGH);
 //  gpio_hold_en(DISPLAY_PIN);
 /*
   //Setup sleep wakeup on Touch Pad 3 ( GPIO15 )
@@ -29,11 +31,13 @@ void setup() {
   esp_sleep_enable_ext0_wakeup(GPIO_NUM_14,1);
 */
   // wake on shock sensor
+//  adcAttachPin(SHOCK_PIN);
   pinMode(SHOCK_PIN, INPUT_PULLDOWN);
 //  rtc_gpio_deinit(SHOCK_PIN);
 //  rtc_gpio_pulldown_en(SHOCK_PIN);
 
   // wake on charger
+//  adcAttachPin(BOOT_PIN);
   pinMode(BOOT_PIN, INPUT);
 
   // SHOCK_PIN | BOOT_PIN
@@ -128,5 +132,6 @@ void setup() {
   // disable AudioLogger
   Print* audioLogger = &silencedLogger;
 
+  LEDmode = 0x10;
   turnOnController();
 }
