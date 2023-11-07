@@ -3,14 +3,14 @@
 
 ![cover](https://raw.githubusercontent.com/A-Emile/Lime_Gen3_IoT_Replacement/main/iot_original.png)
 
-The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can controll it with our own app.
+The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can control it with our own app.
 If you find out more about the communication, please submit it here.
 
 ## How it works
 The IoT module gets replaced with an ESP32 microcontroller to enable us to control the scooter with our app. The app communicates with the ESP32 using Bluetooth Low Energy (BLE). The ESP32 replaces the function of the original IoT while also providing real-time feedback on speed, battery level, and other information.
 
 ## Installation
-Install the ESP32 add-on for Arduino IDE if you doesnt have already. [Here is a tutorial](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/)
+Install the ESP32 add-on for Arduino IDE if you doesnt have already. [Here is a tutorial](https://randomnerdtutorials.com/installing-the-esp32-board-in-arduino-ide-windows-instructions/). The Sketch is created with Arduino 1.8.19 for board platform esp32 by Espressif Systems version 2.0.13. Downgrade version to avoid exceeding of program storage space. Maximum is 1310720 bytes.
 
 Install the [crc](https://github.com/RobTillaart/CRC) library by robtillaart from the library manager.
 
@@ -19,7 +19,7 @@ Flash the controller with [unlocked firmware](https://cloud.scooterhacking.org/r
 Flash the arduino code from [LimeIoT](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main/LimeIoT) folder to the esp32.
 
 
-<b>Note:</b> The controller gives you 36v. So you have to convert it to stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
+<b>Note:</b> The controller gives you 42v. So you have to convert it to stable 5v for the display and the esp32. I have done it using a buck converter and ams1117.
 
 Connect the wires:
 
@@ -30,14 +30,17 @@ Connect the wires:
 | Controller lock  | GPIO 12   |
 | Controller RX    | GPIO 1    |
 | Controller TX    | GPIO 3    |
-| Controller 36v   | Buck converter -> ams1117 -> 5V |
+| Controller 42v   | Buck converter -> ams1117 -> 5V |
 | Controller Gnd   | Gnd       |
+| Controller Charge (2) | GPIO 33 |
 | Display 5v       | 5V        |
 | Display Gnd      | Gnd       |
-| Display TX       | GPIO  16  |
-| Display RX       | GPIO  17  |
+| Display TX       | GPIO 16   |
+| Display RX       | GPIO 17   |
 
-If you want, you can connect the speaker to `GPIO 13`.
+(Optional) If you want, you can connect the speaker to `GPIO 13` with a base resistor and transistor. For the [pcb board](https://scootertalk.org/forum/viewtopic.php?t=5474&start=188) the speaker is `GPIO 25`. For more gain connect Adafruit I2S Amplifier [MAX98357A](https://www.adafruit.com/product/3006) DIN `GPIO 27` BCLK `GPIO 26` LRCLK `GPIO 25`.
+
+(Optional) You can connect any alarm sensor to `GPIO 14` max input voltage 4.6v (!)
 
 ## Usage
 You can download the app here: [App.apk](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/raw/main/App.apk)
@@ -77,7 +80,7 @@ The following table shows the known meaning of the bytes in the commands send to
 | Byte | Meaning |
 |--|--|
 | 12 | Status (see below) |
-| 14 | Batttery |
+| 14 | Battery |
 | 16-17 | Speed |
 | last byte | checksum |
 
@@ -99,6 +102,25 @@ The following table shows the known meaning of the bytes in the commands send to
 | 45 | Driving Max Speed |
 | 51 | Upgrading |
 
-#### Example: `4C 42 44 43 50 01 10 11 00 09 01 31 01 1E 02 00 CD 01 00 9A`
+#### Example: `4C 42 44 43 50 01 10 11 00 09 01 31 01 1E 02 00 CD 01 9A`
+
+
+## LED Communication
 
 You can turn off the red LED with the following command: `4C 42 44 43 50 01 10 1B 00 08 03 00 00 00 03 00 00 00`
+
+| Byte | Meaning |
+|--|--|
+| 12 | red |
+| 13 | yellow |
+| 14 | green |
+
+
+#### LED Bits:
+| Bits | State |
+|--|--|
+| 00 | off |
+| 01 | on |
+| 11 | blink |
+
+LED byte has two bits = bit for blink + bit for power

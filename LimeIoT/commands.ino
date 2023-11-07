@@ -6,70 +6,56 @@ class MainBLECallback : public BLECharacteristicCallbacks {
       for (int i = 0; i < value.length(); i++) {
         command = command + value[i];
       }
-
+      commandIsSending = true;
       if (command == "lock") {
-        lockBeeb();
+        playMP3("/lock.mp3");
+        delay(100);
         unlockForEver = 0;
-        sendControllerCommand(offEscByte, sizeof(offEscByte));
-        isUnlocked = 0;
-        sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
-        lightIsOn = 0;
+        lockScooter();
       }
       if (command == "unlock") {
+        playMP3("/unlock.mp3");
+        delay(100);
         unlockForEver = 0;
-        unlockBeeb();
-        if (!controllerIsOn) {
-          digitalWrite(LOCK_PIN, HIGH);
-          delay(3000);
-          controllerIsOn = 1;
-        }
-        sendControllerCommand(onEscByte, sizeof(onEscByte));
-        isUnlocked = 1;
-        sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
-        lightIsOn = 1;
+        unlockScooter();
       }
       if (command == "on") {
-        digitalWrite(LOCK_PIN, HIGH);
-        controllerIsOn = 1;
+        turnOnController();
       }
       if (command == "off") {
-        digitalWrite(LOCK_PIN, LOW);
-        controllerIsOn = 0;
-        isUnlocked = 1;
+        lockScooter();
+        turnOffController();
       }
       if (command == "unlockforever") {
+        playMP3("/unlock.mp3");
+        delay(100);
         unlockForEver = 1;
         unlockScooter();
-        tone(BUZZZER_PIN, 800, 100);
-        delay(100);
-        tone(BUZZZER_PIN, 800, 100);
-        delay(100);
       }
       if (command == "alarm") {
         alarmBeeb();
       }
       if (command == "lighton") {
         sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
+        delay(100);
         lightIsOn = 1;
       }
       if (command == "lightoff") {
         sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
+        delay(100);
         lightIsOn = 0;
       }
       if (command == "shutdown") {
-        digitalWrite(LOCK_PIN, LOW);
-        controllerIsOn = 0;
-        isUnlocked = 0;
-        lightIsOn = 0;
+        lockScooter();
+        turnOffController();
         esp_deep_sleep_start();
       }
       if (command == "reboot") {
-        digitalWrite(LOCK_PIN, LOW);
-        controllerIsOn = 0;
-        isUnlocked = 0;
-        lightIsOn = 0;
-        esp_deep_sleep_start();
+        lockScooter();
+        turnOffController();
+        ESP.restart();
       }
+      commandIsSending = false;
     }
   }
 };

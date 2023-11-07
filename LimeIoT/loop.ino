@@ -1,28 +1,76 @@
-
 unsigned long prevMillis = 0;
 const long linterval = 250;
 
+unsigned long lastOnTime = 0;
+const unsigned short sleepTimer = 3 * 60 * 60; // 3 hours
+
+// inhibit driving without hearthbeat timeout
+unsigned long lastConnected = 0;
+const unsigned short lockTimer = 3 * 60 ; // 3 minutes
 
 void loop() {
   unsigned long currentTime = millis() / 1000;
-
-  // Calculate the time difference in seconds
-  unsigned long timeDifference = 1 * 60 * 60 - currentTime;  // 2 hours
-
- if (timeDifference <= 0) {
-    // If more than 1 hour have passed, go to deep sleep
-    digitalWrite(LOCK_PIN, LOW);
-    controllerIsOn = 0;
-    esp_deep_sleep_start();
+/*
+  // If more than 3 hours have passed, go to deep sleep
+  if ((currentTime - lastOnTime) > sleepTimer) {
+    lockScooter();
+    turnOffController();
+    digitalWrite(DISPLAY_PIN, HIGH);
+//    digitalWrite(DISPLAY_PIN, LOW);
+    // wait for BOOT_PIN state was updated
+    if (!isBooted || (currentTime - lastOnTime) > sleepTimer + 30) {
+      lastOnTime = currentTime;
+      esp_deep_sleep_start();
+    }
   }
-  
-  if (digitalRead(SHOCK_PIN) == HIGH) {
+*/
+  if (isUnlocked || isCharging) {
+    lastOnTime = currentTime;
+  }
+  // arm the alarm on shock sensor
+  if (isDisconnected && (currentTime - lastConnected) > lockTimer && (currentTime - lastOnTime) > lockTimer) {
+    isDisconnected = false;
+  }
+/*
+  // wake on shock sensor
+  if (digitalRead(SHOCK_PIN) == HIGH && !alarmIsOn && !deviceConnected && !isDisconnected && !isUnlocked && !unlockForEver) {
+//  if (analogReadMilliVolts(SHOCK_PIN) > 700 && !alarmIsOn && !deviceConnected && !isDisconnected && !isUnlocked && !unlockForEver) {
+    digitalWrite(DISPLAY_PIN, LOW);
+//    digitalWrite(DISPLAY_PIN, HIGH);
     alarmBeeb();
+    alarm_cnt++; // avoid disorderly conduct in night mode
+    currentTime = millis() / 1000;
+    lastOnTime = currentTime;
+    isIdle = false;
+  }
+*/
+  // wake on charger (decrease idle time with pull-down resistor)
+  getPin(BOOT_PIN, &isBooted, 5);
+  if (isBooted || (currentTime % 80000 == 0)) {
+    if (!controllerIsOn && !isIdle) { // update battery once a day
+      digitalWrite(DISPLAY_PIN, LOW);
+//      digitalWrite(DISPLAY_PIN, HIGH);
+      lastOnTime = currentTime;
+      turnOnController();
+    }
+  }
+  // lock on charging
+  if (isUnlocked && isCharging && !unlockForEver && !commandIsSending && !alarmIsOn && !isMP3Playing) {
+    playMP3("/lock.mp3");
+    lockScooter();
+  }
+  // turn off on charging idle
+  if (!isIdle && controllerIsOn && !alarmIsOn && !deviceConnected && !unlockForEver && (currentTime - lastOnTime) > 30) {
+    lockScooter();
+    turnOffController();
+  }
+  if (isIdle && !isBooted) {
+    isIdle = false;
   }
 
   unsigned long currMillis = millis();
-  byte txByte[] = { isUnlocked, unlockForEver, speed, battery, throttle, lightIsOn, controllerIsOn, isCharging, alarmIsOn };
-  byte settingsByte[] = { max_speed, alarm_delay, alarm_freq, alarm_reps };
+  byte txByte[] = { isUnlocked, unlockForEver, (byte)speed, battery, throttle, lightIsOn, controllerIsOn, isCharging, alarmIsOn };
+  byte settingsByte[] = { (byte)max_speed, (byte)alarm_delay, (byte)alarm_freq, (byte)alarm_reps };
 
   if (currMillis - prevMillis >= linterval) {
     prevMillis = currMillis;  // update prevMillis with current time
@@ -31,25 +79,27 @@ void loop() {
       pSettingsCharacteristic->setValue(settingsByte, sizeof(txByte));
       pMainCharacteristic->setValue(txByte, sizeof(txByte));
       pMainCharacteristic->notify();
-    }
-    if (controllerIsOn) {
-      if (!isSending) {
-        sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
+    } else if (isUnlocked && !unlockForEver && (currentTime - lastConnected > lockTimer)) {
+        lockScooter();
+      }
+    if (controllerIsOn && !commandIsSending) {
+      sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
+      if (deviceConnected || unlockForEver) {
+        lastConnected = currentTime;
       }
     }
   }
   // disconnecting
   if (!deviceConnected && oldDeviceConnected) {
-    if (unlockForEver == 0) {
-      lockScooter();
-      digitalWrite(LOCK_PIN, LOW);
-      controllerIsOn = 0;
+    if (!unlockForEver && !isCharging) {
+      turnOffController();
     }
-    disconnectedBeeb();
+    playMP3("/disconnected.mp3");
     delay(500);                   // give the bluetooth stack the chance to get things ready
     pServer->startAdvertising();  // restart advertising
     Serial.println("start advertising");
     oldDeviceConnected = deviceConnected;
+    isDisconnected = true;
   }
   // connecting
   if (deviceConnected && !oldDeviceConnected) {
@@ -57,7 +107,7 @@ void loop() {
     Serial.println("connecting");
     oldDeviceConnected = deviceConnected;
   }
-  if (controllerIsOn) {
+  if (controllerIsOn || isUnlocked) {
     readController();
   }
 }

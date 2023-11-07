@@ -1,45 +1,76 @@
 void unlockBeeb() {
-  tone(BUZZZER_PIN, 400, 100);
+  tone(BUZZER_PIN, 400, 100);
   delay(100);
-  tone(BUZZZER_PIN, 500, 100);
+  tone(BUZZER_PIN, 500, 100);
   delay(100);
-  noTone(BUZZZER_PIN);
+  noTone(BUZZER_PIN);
+/*
+  beep(400, 100);
+  beep(500, 100);
+*/
 }
 
 void lockBeeb() {
-  tone(BUZZZER_PIN, 500, 100);
+  tone(BUZZER_PIN, 500, 100);
   delay(100);
-  tone(BUZZZER_PIN, 400, 100);
+  tone(BUZZER_PIN, 400, 100);
   delay(100);
-  noTone(BUZZZER_PIN);
+  noTone(BUZZER_PIN);
+/*
+  beep(500, 100);
+  beep(400, 100);
+*/
 }
 
 void connectedBeeb() {
-  tone(BUZZZER_PIN, 300, 100);
+  tone(BUZZER_PIN, 300, 100);
   delay(100);
-  tone(BUZZZER_PIN, 400, 100);
+  tone(BUZZER_PIN, 400, 100);
   delay(100);
-  tone(BUZZZER_PIN, 500, 100);
+  tone(BUZZER_PIN, 500, 100);
   delay(100);
-  noTone(BUZZZER_PIN);
+  noTone(BUZZER_PIN);
+/*
+  beep(300, 100);
+  beep(400, 100);
+  beep(500, 100);
+*/
 }
 
 void disconnectedBeeb() {
-  tone(BUZZZER_PIN, 300, 100);
+  tone(BUZZER_PIN, 300, 100);
   delay(100);
+//  beep(300, 100);
 }
 
 void alarmBeeb() {
-  sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
-  for (int i = 0; i < alarm_reps; i++) {
-    digitalWrite(LOCK_PIN, HIGH);
-    tone(BUZZZER_PIN, alarm_freq);
-    delay(alarm_delay);
-    noTone(BUZZZER_PIN);
-    delay(alarm_delay);
+  alarmIsOn = 1;
+  if (!controllerIsOn) {
+    turnOnController();
+    delay(1500);
   }
-  sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
-  if (controllerIsOn == 0) {
-    digitalWrite(LOCK_PIN, LOW);
-  }
+  // avoid disorderly conduct in night mode
+  if (alarm_cnt < 10) {
+    playMP3("/alarm.mp3");
+    sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
+    for (int i = 0; i < alarm_reps; i++) {
+      LEDmode = 0x10;
+      sendDisplayLED(red, on);
+//      beep(alarm_freq, alarm_delay);
+      delay(alarm_delay);
+      LEDmode = 0x00;
+      sendDisplayLED(red, off);
+      delay(alarm_delay);
+    }
+    sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
+    for (int i = 0; i < alarm_reps; i++) {
+      LEDmode = 0x10;
+      sendDisplayLED(red, on);
+      delay(alarm_delay);
+      LEDmode = 0x00;
+      sendDisplayLED(red, off);
+      delay(alarm_delay);
+    }
+  } else delay((4UL * alarm_delay * alarm_reps) + 1000); // debounce GPIO input
+  alarmIsOn = 0;
 }
