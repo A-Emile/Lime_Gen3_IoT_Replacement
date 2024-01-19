@@ -13,10 +13,10 @@ void loop() {
     // If more than 1 hour have passed, go to deep sleep
     digitalWrite(LOCK_PIN, LOW);
     controllerIsOn = 0;
-    esp_deep_sleep_start();
+    //esp_deep_sleep_start();
   }
   
-  if (digitalRead(SHOCK_PIN) == HIGH) {
+  if (digitalRead(SHOCK_PIN) == LOW && !isUnlocked) {
     alarmBeeb();
   }
 
@@ -33,7 +33,7 @@ void loop() {
       pMainCharacteristic->notify();
     }
     if (controllerIsOn) {
-      if (!isSending) {
+      if (!commandIsSending) {
         sendControllerCommand(hearthBeatEscByte, sizeof(hearthBeatEscByte));
       }
     }

@@ -30,9 +30,12 @@ void disconnectedBeeb() {
 }
 
 void alarmBeeb() {
+  if (controllerIsOn == 0) {
+    digitalWrite(LOCK_PIN, HIGH);
+    delay(1000);
+  }
   sendControllerCommand(lightBlinkEscByte, sizeof(lightBlinkEscByte));
   for (int i = 0; i < alarm_reps; i++) {
-    digitalWrite(LOCK_PIN, HIGH);
     tone(BUZZZER_PIN, alarm_freq);
     delay(alarm_delay);
     noTone(BUZZZER_PIN);

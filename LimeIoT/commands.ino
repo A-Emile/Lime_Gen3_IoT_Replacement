@@ -6,26 +6,32 @@ class MainBLECallback : public BLECharacteristicCallbacks {
       for (int i = 0; i < value.length(); i++) {
         command = command + value[i];
       }
-
+      commandIsSending = true;
       if (command == "lock") {
         lockBeeb();
+        delay(100);
         unlockForEver = 0;
         sendControllerCommand(offEscByte, sizeof(offEscByte));
+        delay(100);
         isUnlocked = 0;
         sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
+        delay(100);
         lightIsOn = 0;
       }
       if (command == "unlock") {
         unlockForEver = 0;
         unlockBeeb();
+        delay(100);
         if (!controllerIsOn) {
           digitalWrite(LOCK_PIN, HIGH);
           delay(3000);
           controllerIsOn = 1;
         }
         sendControllerCommand(onEscByte, sizeof(onEscByte));
+        delay(100);
         isUnlocked = 1;
         sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
+        delay(100);
         lightIsOn = 1;
       }
       if (command == "on") {
@@ -50,10 +56,12 @@ class MainBLECallback : public BLECharacteristicCallbacks {
       }
       if (command == "lighton") {
         sendControllerCommand(lightOnEscByte, sizeof(lightOnEscByte));
+        delay(100);
         lightIsOn = 1;
       }
       if (command == "lightoff") {
         sendControllerCommand(lightOffEscByte, sizeof(lightOffEscByte));
+        delay(100);
         lightIsOn = 0;
       }
       if (command == "shutdown") {
@@ -70,6 +78,7 @@ class MainBLECallback : public BLECharacteristicCallbacks {
         lightIsOn = 0;
         esp_deep_sleep_start();
       }
+      commandIsSending = false;
     }
   }
 };

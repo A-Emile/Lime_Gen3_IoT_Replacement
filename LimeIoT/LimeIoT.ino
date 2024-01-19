@@ -67,9 +67,11 @@ int alarm_freq = 3000;
 int alarm_reps = 15;
 int max_speed = 28;
 
-bool isSending = false;
+bool commandIsSending = false;
 
 RTC_DATA_ATTR int bootCount = 0;
+
+#define BUTTON_PIN_BITMASK 0x200000000 // 2^33 in hex
 
 // BLE
 #define SERVICE_UUID "653bb0e0-1d85-46b0-9742-3b408f4cb83f"
