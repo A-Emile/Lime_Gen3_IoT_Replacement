@@ -1,6 +1,8 @@
 class MainBLECallback : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pCharacteristic) {
-    String value = pCharacteristic->getValue(); // remove str::string (issues/16) 
+    String preValue = pCharacteristic->getValue(); // remove str::string (issues/16) 
+    std::string value = preValue.c_str();
+    
     if (value.length() > 0) {
       String command = "";
       for (int i = 0; i < value.length(); i++) {
