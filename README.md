@@ -16,7 +16,9 @@ The replacement IoT consists of the following crucial parts:
 - **MAX98357A DAC (optional)** for playing feedback sounds on the speaker.
 
 ## Motivation
-The 3th Generation of Lime scooters slowly gets replaced by their 4th Generation. This leads to many dumped gen 3 scooters. They get often selled on local auction. Since its not easely possible to use the scooters with their default hardware, we have created this project, to give them a new life.
+The 3th Generation of Lime scooters slowly gets replaced by their 4th Generation.
+This leads to many dumped gen 3 scooters wich can often be optained from auctions.
+Since its not easely possible to use the scooters with their default hardware, we have created this project, to give them a new life.
 
 ## Usage
 Follow [this document (coming soon)]() to build the iot or buy a finished plug an play version [here (coming soon)]().<br></br>
