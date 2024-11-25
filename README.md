@@ -1,4 +1,4 @@
-# Lime Gen 3 Personal IoT V2 (In active development. Not finished yet)
+# Lime Gen 3 Personal IoT V2 (In active development. Not working yet)
 If you dont want to wait for V2, switch to the [main branche](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main)
 ### !!! This project is not endorsed or supported by Lime or any affiliated companies. Only do this on legally obtained scooters you own. !!!
 
