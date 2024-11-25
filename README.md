@@ -1,7 +1,7 @@
 # Lime_Gen3_IoT_Replacement
 <b>Note:</b> This project is not endorsed or supported by Lime or any affiliated companies. Only do this on legally obtained scooter that you own! You can often buy them on auctions.
 
-![cover](https://raw.githubusercontent.com/A-Emile/Lime_Gen3_IoT_Replacement/main/iot_original.png)
+![Screenshot (140)](https://github.com/user-attachments/assets/ad886ee4-42da-4212-b8cb-925b170bc87c)
 
 The goal of this project is to replace the IoT of the Lime Gen 3 with a custom one, so we can controll it with our own app.
 If you find out more about the communication, please submit it here.
