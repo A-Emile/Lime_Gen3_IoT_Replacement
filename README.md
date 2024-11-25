@@ -1,6 +1,6 @@
 # Lime_Gen3_IoT_Replacement
 <b>Note:</b> This project is not endorsed or supported by Lime or any affiliated companies. Only do this on legally obtained scooter that you own! You can often buy them on auctions.<br><br>
-**The Arduino code has been writting with zero knowledge about how to write proper code and may not work correctly. We are working on a new firmware and pcb wich will fix all the bugs and makes everything easier in the [V2 branch](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/v2).**
+**The Arduino code has been written with zero knowledge about how to write proper code and may not work correctly. We are working on a new firmware and pcb wich will fix all the bugs and makes everything easier in the [V2 branch](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/v2).**
 
 ![Screenshot (140)](https://github.com/user-attachments/assets/ad886ee4-42da-4212-b8cb-925b170bc87c)
 
