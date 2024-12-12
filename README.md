@@ -2,7 +2,7 @@
 If you dont want to wait for V2, switch to the [main branche](https://github.com/A-Emile/Lime_Gen3_IoT_Replacement/tree/main)
 ### !!! This project is not endorsed or supported by Lime or any affiliated companies. Only do this on legally obtained scooters you own. !!!
 
-![Screenshot (140)](https://github.com/user-attachments/assets/fd1d2a7c-ae47-482d-b2ee-4e324738a71d)
+![Screenshot (144)](https://github.com/user-attachments/assets/88744d13-bcc1-42a7-b108-644df7f00dc9)
 
 The goal of this project is to replace the IoT of the Lime Gen 3 with one that works offline, can be configured via BLE and supports various unlock methods.
 
